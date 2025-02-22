@@ -1,0 +1,77 @@
+/* Navbar container */
+.navbar {
+  display: flex;
+  position: sticky;
+  align-items: center;
+  justify-content: space-between; /* Space between left and right sections */
+  background-color: #fff;
+  top: 0;
+  height: 8vh;
+  width: 100%;
+  z-index: 1000; /* Ensure navbar stays on top */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* General styles for left & right navbar sections */
+.navbar-segment {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.navbar-left a {
+  height: auto;
+}
+
+/* Logo */
+.navbar-left img {
+  width: 170px;
+  height: auto;
+  object-fit: cover;
+  height: 8vh;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: stretch;
+}
+
+/* Shared styles for UL (left & right sections) */
+.navbar ul {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Shared styles for LI (left & right sections) */
+.navbar ul li {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 15px;
+  border-bottom: 3px solid transparent;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Shared styles for links */
+.navbar ul li a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Hover effects (shared for left & right) */
+.navbar ul li:hover {
+  background-color: rgb(240, 240, 240);
+  border-bottom-color: darkgreen;
+}
+
+.navbar ul li:hover a {
+  color: darkgreen;
+}
