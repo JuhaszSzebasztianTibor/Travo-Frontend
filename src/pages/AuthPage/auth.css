@@ -1,0 +1,93 @@
+/* Center the container */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  padding: 0;
+  width: 100%;
+  max-width: 140vh;
+  border-radius: 10px;
+  background: white;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -45%);
+}
+
+/* Flex container for image and form */
+.auth-content {
+  display: flex;
+  width: 100%;
+  min-height: 70vh;
+}
+
+/* Image styling */
+.auth-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45%;
+  background-color: #f3f3f3;
+  border-radius: 10px 0 0 10px;
+}
+
+.auth-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px 0 0 10px;
+}
+
+/* Form styling */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 55%; /* Increased form width */
+  padding: 60px; /* Increased padding */
+  text-align: center;
+}
+
+/* Name inputs */
+.name-container {
+  display: flex;
+  gap: 12px;
+}
+
+.name-container input {
+  flex: 1;
+}
+
+/* Input fields */
+.auth-form input {
+  width: 100%;
+  padding: 16px;
+  margin: 14px 0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Button styling */
+.auth-button {
+  width: 100%;
+  padding: 16px; /* Bigger button */
+  margin-top: 20px;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  background-color: darkgreen;
+  color: white;
+  cursor: pointer;
+  font-size: 18px; /* Larger font size */
+  font-weight: bold;
+  transition: 0.3s ease-in-out;
+}
+
+.auth-button:hover {
+  color: rgb(2, 161, 2);
+  border-color: rgb(2, 161, 2);
+  background-color: white;
+}
