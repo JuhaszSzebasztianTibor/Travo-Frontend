@@ -1,5 +1,4 @@
-.container {
-  padding: 20px;
-  min-height: 80vh;
+.main-layout-container {
+  height: 100vh;
   margin: auto;
 }

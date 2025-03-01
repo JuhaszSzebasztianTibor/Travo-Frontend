@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
-import travoLogo from "../../assets/Images/travonav.png";
+import travoLogo from "../../assets/Images/travo.png";
 import "./navbar.css";
 import "../../App.css";
-import { useState } from "react";
-
-/*const isLoggedIn(setUserState(), userState) = useState(false);*/
 
 const Navbar = () => {
   return (
@@ -25,10 +22,10 @@ const Navbar = () => {
       <div className="navbar-segment navbar-right">
         <ul>
           <li>
-            <Link to="/signup">Sign up</Link>
+            <Link to="/login">Log in</Link>
           </li>
           <li>
-            <Link to="/login">Log in</Link>
+            <Link to="/signup">Sign up</Link>
           </li>
         </ul>
       </div>
