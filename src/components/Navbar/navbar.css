@@ -3,11 +3,11 @@
   display: flex;
   position: sticky;
   align-items: center;
-  justify-content: space-between; /* Space between left and right sections */
+  justify-content: space-between;
   top: 0;
   height: 8vh;
   width: 100%;
-  z-index: 1000; /* Ensure navbar stays on top */
+  z-index: 1000;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

@@ -45,8 +45,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 55%; /* Increased form width */
-  padding: 60px; /* Increased padding */
+  width: 55%;
+  padding: 60px;
   text-align: center;
 }
 
@@ -74,14 +74,14 @@
 /* Button styling */
 .auth-button {
   width: 100%;
-  padding: 16px; /* Bigger button */
+  padding: 16px;
   margin-top: 20px;
   border: 2px solid transparent;
   border-radius: 50px;
   background-color: darkgreen;
   color: white;
   cursor: pointer;
-  font-size: 18px; /* Larger font size */
+  font-size: 18px;
   font-weight: bold;
   transition: 0.3s ease-in-out;
 }
