@@ -1,4 +1,4 @@
 .main-layout-container {
-  height: 100vh;
+  height: calc(100vh - 8vh);
   margin: auto;
 }

@@ -13,7 +13,7 @@ function Signup() {
   const handleSignup = (e) => {
     e.preventDefault();
     console.log("Signing up:", { firstName, lastName, email, password });
-    navigate("/"); // Redirect after signup
+    navigate("/profile"); // Redirect after signup
   };
 
   return (

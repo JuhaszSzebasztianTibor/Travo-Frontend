@@ -11,7 +11,7 @@ function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Logging in:", { email, password });
-    navigate("/"); // Redirect after login
+    navigate("/profile"); // Redirect after login
   };
 
   return (
