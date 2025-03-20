@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ selectedTab, setSelectedTab }) => {
   const [isDropupOpen, setIsDropupOpen] = useState(false); // State to manage dropdown visibility
 
   // Toggle dropdown visibility
@@ -32,7 +32,22 @@ const Sidebar = () => {
         <input type="text" className="search-bar" placeholder="Search.." />
         <i className="fa fa-search search-icon"></i>
       </div>
-      <div className="sidebar-navigation-menu"></div>
+      <div className="sidebar-navigation-menu">
+        <button
+          onClick={() => setSelectedTab("upcoming")}
+          className={`sidebar-btn ${
+            selectedTab === "upcoming" ? "active" : ""
+          }`}
+        >
+          Upcoming Trips
+        </button>
+        <button
+          onClick={() => setSelectedTab("past")}
+          className={`sidebar-btn ${selectedTab === "past" ? "active" : ""}`}
+        >
+          Past Trips
+        </button>
+      </div>
       <div className="sidebar-bottom-action">
         <div className="dropup">
           <button className="dropbtn" onClick={toggleDropup}>
