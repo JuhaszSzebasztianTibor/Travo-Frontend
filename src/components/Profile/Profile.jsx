@@ -1,7 +1,7 @@
 import { tripsData } from "./data/trips";
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import useTrips from "../../Hooks/useTrips";
+import useTrips from "../../hooks/useTrips";
 import "../../components/Sidebar/sidebar.css";
 import "./profile.css";
 import UpcomingTrips from "./UpcomingTrips";
