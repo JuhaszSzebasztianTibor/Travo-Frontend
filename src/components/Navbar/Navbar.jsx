@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+
 import travoLogo from "../../assets/Images/travo.png";
+
 import "./navbar.css";
 import "../../App.css";
 
 const Navbar = () => {
+  const [isLogedIn, setIsLogedIn] = useState(true);
+
+  const handleLogout = () => {
+    setIsLogedIn(false);
+  };
+
   return (
     <nav className="navbar">
       {/* Left Section: Logo & About */}
@@ -12,21 +21,40 @@ const Navbar = () => {
           <img src={travoLogo} alt="Travo logo" />
         </Link>
         <ul>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
+          {!isLogedIn && (
+            <li className="highlight-link">
+              <Link to="/about">About</Link>
+            </li>
+          )}
         </ul>
       </div>
 
       {/* Right Section: Log in & Sign up */}
       <div className="navbar-segment navbar-right">
         <ul>
-          <li>
-            <Link to="/login">Log in</Link>
-          </li>
-          <li>
-            <Link to="/signup">Sign up</Link>
-          </li>
+          {isLogedIn ? (
+            <>
+              <li>
+                <button className="icon-btn">
+                  <i className="fas fa-bell"></i>
+                </button>
+              </li>
+              <li>
+                <button className="icon-btn">
+                  <i className="fas fa-plus"></i> Add
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="highlight-link">
+                <Link to="/login">Log in</Link>
+              </li>
+              <li className="highlight-link">
+                <Link to="/signup">Sign up</Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./sidebar.css";
 
 const Sidebar = ({ selectedTab, setSelectedTab }) => {
@@ -17,7 +17,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
   };
 
   // Add event listener to close dropdown when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener("click", closeDropup);
     return () => {
       document.removeEventListener("click", closeDropup);

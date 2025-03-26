@@ -70,11 +70,13 @@
 }
 
 /* Hover effects (shared for left & right) */
-.navbar ul li:hover {
-  background-color: rgb(240, 240, 240);
-  border-bottom-color: darkgreen;
-}
 
 .navbar ul li:hover a {
   color: darkgreen;
+}
+
+.highlight-link:hover {
+  text-decoration: none !important;
+  background-color: rgb(240, 240, 240);
+  border-bottom-color: darkgreen;
 }

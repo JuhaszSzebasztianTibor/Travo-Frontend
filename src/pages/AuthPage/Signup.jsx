@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 import authImage from "../../assets/Images/auth.jpg"; // Import the CSS file
 
@@ -59,6 +59,11 @@ function Signup() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <p>
+              <Link to="/login" className="auth-link">
+                Already have an account?
+              </Link>
+            </p>
             <button className="auth-button" type="submit">
               Sign Up
             </button>

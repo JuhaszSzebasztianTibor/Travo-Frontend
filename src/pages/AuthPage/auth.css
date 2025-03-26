@@ -91,3 +91,16 @@
   border-color: rgb(2, 161, 2);
   background-color: white;
 }
+
+.auth-link {
+  color: darkgreen;
+  font-size: large;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+  color: green;
+}
