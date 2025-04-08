@@ -43,10 +43,10 @@ export const tripsData = [
   },
   {
     id: 6,
-    destination: "Mehkerek",
+    destination: "Oradea",
     date: "2024-11-09",
-    description: "A great time exploring London",
+    description: "A great time exploring Oradea",
     image:
-      "https://c4.wallpaperflare.com/wallpaper/419/725/96/city-street-london-bus-wallpaper-thumb.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
   },
 ];

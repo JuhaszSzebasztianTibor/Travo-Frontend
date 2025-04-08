@@ -1,0 +1,32 @@
+export const destinationsData = [
+  {
+    id: 1,
+    name: "London",
+    nights: 8,
+    activities: 2,
+    transport: "565 km",
+    startDate: "Fri 28 Feb",
+    endDate: "Sat 08 Mar",
+    notes: "hdasidais ",
+  },
+  {
+    id: 2,
+    name: "Paris",
+    nights: 3,
+    activities: 4,
+    transport: "293 km",
+    startDate: "Sat 08 Mar",
+    endDate: "Tue 11 Mar",
+    notes: "",
+  },
+  {
+    id: 3,
+    name: "Brussels",
+    nights: 1,
+    activities: 0,
+    transport: "",
+    startDate: "Tue 11 Mar",
+    endDate: "Wed 12 Mar",
+    notes: "",
+  },
+];

@@ -1,0 +1,76 @@
+.planner-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: #f9fcfd;
+  width: 80px; /* Adjusted width */
+  align-items: center;
+  overflow: hidden; /* Prevent overflow outside the sidebar */
+}
+
+.planner-sidebar ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Ensure items are spaced out */
+  flex-grow: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%; /* Ensure the list takes up full width of the sidebar */
+}
+
+.planner-sidebar li {
+  padding: 10px 0;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.3s;
+  width: 100%; /* Ensure the li takes full width of the sidebar */
+}
+
+/* Remove hover from entire link box */
+.planner-sidebar li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0; /* Padding only around text and icon */
+  width: 100%; /* Ensure the link takes up full width of the li */
+  box-sizing: border-box; /* Prevents padding from increasing the width */
+}
+
+.planner-sidebar a {
+  padding: 0;
+  width: 100%;
+}
+
+.plane-img {
+  border-bottom: 1px solid #aeabab;
+  width: 100%; /* Make the image take the full width of the sidebar */
+  height: 70px;
+  object-fit: contain;
+}
+
+/* Style for the icon */
+.planner-sidebar i {
+  font-size: 20px;
+  margin-bottom: 5px;
+  color: transparent;
+  -webkit-text-stroke: 1px black;
+}
+
+/* Optional: style the text color when hovered */
+.planner-sidebar a:hover i,
+.planner-sidebar a:hover span {
+  color: rgb(2, 161, 2); /* Change color of icon and text on hover */
+}
+
+.plane-img:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+.planner-sidebar li:last-child {
+  margin-top: auto;
+  border-top: 1px solid #aeabab;
+}

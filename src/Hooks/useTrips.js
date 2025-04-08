@@ -16,5 +16,3 @@ export default function useTrips(initialTrips) {
 
   return { upcomingTrips, pastTrips };
 }
-
-// export default useTrips;

@@ -1,0 +1,21 @@
+.budget-menu-container {
+  padding: 20px;
+}
+
+.budget-add-btn {
+  background-color: darkgreen;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.budget-add-btn:hover {
+  color: rgb(2, 161, 2);
+  border-color: rgb(2, 161, 2);
+  background-color: white;
+}

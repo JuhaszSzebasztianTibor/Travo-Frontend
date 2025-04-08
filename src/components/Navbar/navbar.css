@@ -80,3 +80,32 @@
   background-color: rgb(240, 240, 240);
   border-bottom-color: darkgreen;
 }
+
+.nav-btn {
+  background-color: darkgreen;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.notification-btn {
+  border-radius: 50%;
+  background-color: #f1ffee;
+  color: darkgreen;
+}
+
+.notification-btn:hover {
+  color: rgb(2, 161, 2) !important;
+  background-color: #f1ffee !important;
+  border-color: #f1ffee !important;
+}
+
+.nav-btn:hover {
+  color: rgb(2, 161, 2);
+  border-color: rgb(2, 161, 2);
+  background-color: white;
+}
