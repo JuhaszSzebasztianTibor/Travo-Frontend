@@ -122,3 +122,10 @@
 .switch-input:checked + .switch-slider::before {
   transform: translateX(24px);
 }
+
+/* Remove number input arrows in all browsers */
+.no-arrows::-webkit-outer-spin-button,
+.no-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

@@ -8,6 +8,7 @@ import Signup from "./pages/AuthPage/Signup.jsx";
 import Profile from "./pages/ProfilePage/ProfilePage.jsx";
 import PlannerPage from "./pages/PlannerPage/PlannerPage.jsx";
 import BudgetPage from "./pages/BudgetPage/BudgetPage.jsx";
+import PackingPage from "./pages/PackingPage/PackingPage.jsx";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
         <Route element={<PlannerLayout />}>
           <Route path="/trip/plan" element={<PlannerPage />} />
           <Route path="/trip/budget" element={<BudgetPage />} />
-          <Route path="/trip/packing" />
+          <Route path="/trip/packing" element={<PackingPage />} />
         </Route>
       </Routes>
     </Router>

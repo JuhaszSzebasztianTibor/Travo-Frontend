@@ -5,7 +5,7 @@
   width: 100%;
 }
 
-.left-panel {
+.planner-container .left-panel {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -106,7 +106,7 @@
 .currency-options {
   position: absolute;
   top: 100%;
-  left: -50px;
+  left: -70px;
   background: white;
   border: 1px solid #eee;
   border-radius: 4px;
@@ -188,6 +188,7 @@
 
 /* Tabs */
 .planner-tabs {
+  font-size: 18px;
   margin-bottom: 20px;
 }
 

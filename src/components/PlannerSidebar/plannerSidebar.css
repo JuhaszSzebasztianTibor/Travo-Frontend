@@ -5,6 +5,7 @@
   width: 80px; /* Adjusted width */
   align-items: center;
   overflow: hidden; /* Prevent overflow outside the sidebar */
+  border-right: 1px ridge #aeabab;
 }
 
 .planner-sidebar ul {

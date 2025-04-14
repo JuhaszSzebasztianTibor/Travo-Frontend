@@ -1,6 +1,12 @@
 import DestinationRow from "./DestinationRow";
 
-const DestinationList = ({ destinations, onNightsChange, onNotesChange }) => (
+const DestinationList = ({
+  destinations,
+  onNightsChange,
+  onNotesChange,
+  totalNightsPlanned,
+  goal,
+}) => (
   <div className="planner-list-wrapper">
     <div className="destinationview-table-header">
       <ul>
@@ -34,6 +40,8 @@ const DestinationList = ({ destinations, onNightsChange, onNotesChange }) => (
           {...destination}
           onNightsChange={onNightsChange}
           onNotesChange={onNotesChange}
+          totalNightsPlanned={totalNightsPlanned}
+          goal={goal}
         />
       ))}
     </div>

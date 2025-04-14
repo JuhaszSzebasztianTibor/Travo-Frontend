@@ -1,21 +1,207 @@
-.budget-menu-container {
-  padding: 20px;
+.budget-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* cleaner */
+  gap: 2rem; /* tighter spacing */
+  padding: 2rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.budget-container .left-panel,
+.budget-container .middle-panel,
+.budget-container .right-panel {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .budget-add-btn {
   background-color: darkgreen;
+  color: white;
+  padding: 12px 14px;
   border: 2px solid transparent;
   border-radius: 50px;
-  width: 100%;
-  padding: 12px 14px;
-  font-size: 14px;
-  color: white;
   cursor: pointer;
-  transition: 0.3s;
+  margin-bottom: 1rem;
+}
+
+.budget-add-btn i {
+  margin-right: 6px;
+}
+
+.expense-date-group {
+  margin-bottom: 1.5rem;
+}
+
+.expense-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 100px;
+  background-color: #f1ffee;
+  color: darkgreen;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid darkgreen;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 120%;
+  left: 90%;
+  margin-left: -60px;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.expense-icon {
+  font-size: 1.5rem;
+  color: darkgreen;
+  width: 24px;
+}
+
+.expense-info {
+  flex-grow: 1;
+}
+
+.expense-amount {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Updated and cleaned up progress bar container */
+.circle-progressbar-container {
+  position: relative;
+  width: 180px; /* Size of the circle */
+  height: 180px;
+  margin-bottom: 10px; /* Space between the circle and the total cost text */
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 20px;
+  color: #333;
+}
+
+.summary-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content horizontally */
+  justify-content: center;
+  text-align: center;
+}
+
+.summary-total h2 {
+  margin: 0;
+  color: #333;
+}
+
+.summary-total p {
+  margin: 0;
+  font-size: medium;
+  color: #888;
+}
+
+.summary-breakdown {
+  display: flex;
+  justify-content: center; /* centers the items horizontally */
+  font-size: 1.1rem;
+  color: #333;
+  margin: 20px auto 0 auto; /* adds top margin and auto horizontal margins */
+  gap: 60px; /* space between the items; adjust as needed */
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.status-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Adjust gap as needed */
+}
+
+/* Dot styling */
+.status .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ccc; /* Default dot color */
+  display: inline-block;
+}
+
+/* Override the dot color for each status */
+.status.paid .dot {
+  background-color: #4caf50;
+}
+
+.status.pending .dot {
+  background-color: #f0f0f0;
+}
+
+.status p {
+  margin: 0;
+}
+
+.total {
+  font-size: 1.2rem;
+  padding-left: 15px;
+  margin-top: 0.5rem; /* Space between label line and total amount */
+}
+
+.category-summary {
+  margin-top: 3rem;
+  text-align: center; /* Centers the overall container including the header */
+}
+
+/* This container will be centered but its content will align left */
+.category-items {
+  display: inline-block;
+  text-align: left;
+}
+
+.category-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.75rem;
 }
 
 .budget-add-btn:hover {
-  color: rgb(2, 161, 2);
-  border-color: rgb(2, 161, 2);
+  color: green;
   background-color: white;
+  border-color: green;
 }

@@ -71,6 +71,8 @@ const Planner = () => {
         <DestinationList
           destinations={destinations}
           onNightsChange={handleNightsChange}
+          totalNightsPlanned={totalNightsPlanned}
+          goal={goal}
         />
         <input
           type="text"

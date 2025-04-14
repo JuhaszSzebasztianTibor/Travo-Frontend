@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import AddExpenseModal from "./AddExpenseForm";
+import PaidExpenses from "./PaidExpenses";
+import PendingExpenses from "./PendingExpenses";
+import SummaryPanel from "./SummaryPanel";
+import AddExpenseForm from "./AddExpenseForm";
+import { getCategoryIcon, categories } from "./utils/categoryUtils";
 import "./budget.css";
 
 const Budget = () => {
@@ -7,36 +11,29 @@ const Budget = () => {
   const [expenses, setExpenses] = useState([]);
 
   const handleSaveExpense = (expense) => {
-    console.log("Saved expense:", expense);
     setExpenses((prev) => [...prev, expense]);
   };
 
   return (
-    <>
-      <div className="budget-container">
-        <div className="budget-menu-container">
-          <h1>Budget</h1>
-          <div className="currency-swithcer"></div>
+    <div className="budget-container">
+      <PaidExpenses
+        expenses={expenses}
+        onAddClick={() => setModalOpen(true)}
+        getCategoryIcon={getCategoryIcon}
+      />
+      <PendingExpenses expenses={expenses} getCategoryIcon={getCategoryIcon} />
+      <SummaryPanel
+        expenses={expenses}
+        categories={categories}
+        getCategoryIcon={getCategoryIcon}
+      />
 
-          <div className="budget-btn-container">
-            <button
-              className="budget-add-btn"
-              onClick={() => setModalOpen(true)}
-            >
-              <i className="fas fa-plus-circle"></i> Add Expense
-            </button>
-          </div>
-
-          {/* Add status circles, categories, etc. here */}
-
-          <AddExpenseModal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            onSave={handleSaveExpense}
-          />
-        </div>
-      </div>
-    </>
+      <AddExpenseForm
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSaveExpense}
+      />
+    </div>
   );
 };
 

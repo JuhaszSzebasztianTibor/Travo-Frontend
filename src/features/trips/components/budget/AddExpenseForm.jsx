@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../../../../components/Modal/Modal";
 import "./addExpenseForm.css";
 
 const AddExpenseForm = ({ isOpen, onClose, onSave }) => {
   const [day, setDay] = useState("");
-  const [category, setCategory] = useState("Sleep");
+  const [category, setCategory] = useState("");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [status, setStatus] = useState("Pending");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDay("");
+      setCategory("");
+      setName("");
+      setAmount("");
+      setCurrency("USD");
+      setStatus("Pending");
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,6 +47,9 @@ const AddExpenseForm = ({ isOpen, onClose, onSave }) => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
+            <option value="" disabled hidden>
+              Select a category...
+            </option>
             <option value="Sleep">Sleep</option>
             <option value="Transport">Transport</option>
             <option value="Visit Places">Visit Places</option>
@@ -61,6 +75,8 @@ const AddExpenseForm = ({ isOpen, onClose, onSave }) => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
+            className="no-arrows"
+            min="0"
           />
         </label>
 
