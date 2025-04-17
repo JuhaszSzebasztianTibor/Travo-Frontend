@@ -172,6 +172,10 @@
   transform: scale(1.5);
 }
 
+.item-row input[type="checkbox"]:hover {
+  cursor: pointer;
+}
+
 .item-row span {
   flex: 1;
 }

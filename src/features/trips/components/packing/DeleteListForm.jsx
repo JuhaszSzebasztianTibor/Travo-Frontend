@@ -22,9 +22,9 @@ const DeleteListForm = ({
                 setShowModal(false);
               }}
             >
-              Delete
+              Yes
             </button>
-            <button onClick={() => setShowModal(false)}>Cancel</button>
+            <button onClick={() => setShowModal(false)}>No</button>
           </div>
         </div>
       </Modal>

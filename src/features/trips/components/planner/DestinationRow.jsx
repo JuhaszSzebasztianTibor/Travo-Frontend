@@ -1,3 +1,5 @@
+import React from "react";
+
 const DestinationRow = ({
   index,
   name,
@@ -7,6 +9,7 @@ const DestinationRow = ({
   startDate,
   endDate,
   onNightsChange,
+  onActivityClick,
   totalNightsPlanned,
   goal,
 }) => {
@@ -36,6 +39,7 @@ const DestinationRow = ({
               type="number"
               className="days"
               value={nights}
+              min="1"
               onChange={(e) => {
                 const newVal = parseInt(e.target.value) || 1;
                 const diff = newVal - nights;
@@ -43,27 +47,30 @@ const DestinationRow = ({
                   onNightsChange(index, newVal);
                 }
               }}
-              min="1"
             />
             <div
               className={`days-control plus ${!canAddMore ? "disabled" : ""}`}
               onClick={() => {
-                if (canAddMore) {
-                  onNightsChange(index, nights + 1);
-                }
+                if (canAddMore) onNightsChange(index, nights + 1);
               }}
             ></div>
           </div>
         </div>
       </div>
-      {/* sleeping, activities, transport */}
       <div className="destination-sleep destination-column">
         <a className="add-btn" href="#">
           <i className="fa fa-plus-circle"></i>
         </a>
       </div>
       <div className="destination-activities destination-column">
-        <a className="add-btn" href="#">
+        <a
+          className="add-btn"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onActivityClick(name); // Pass the name of the destination to the parent
+          }}
+        >
           {activities > 0 ? (
             <span className="activities-selected">
               <span>{activities}</span> to do's

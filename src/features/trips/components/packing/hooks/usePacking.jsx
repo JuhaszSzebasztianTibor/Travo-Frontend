@@ -10,7 +10,7 @@ export function usePacking() {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editListName, setEditListName] = useState("Fancy Dinner");
+  const [editListName, setEditListName] = useState("");
 
   const handleAddItem = () => {
     if (!newItem.trim()) return;
@@ -22,6 +22,12 @@ export function usePacking() {
       ],
     }));
     setNewItem("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleAddItem();
+    }
   };
 
   const handleRemoveItem = (index) => {
@@ -98,7 +104,6 @@ export function usePacking() {
     setLists(updated);
     setCheckedItems(updatedChecked);
     setSelectedList(trimmed);
-    setEditListName(trimmed);
     setShowEditModal(false);
   };
 
@@ -125,6 +130,7 @@ export function usePacking() {
     setShowEditModal,
     setEditListName,
     handleAddItem,
+    handleKeyDown,
     handleRemoveItem,
     handleToggleCheck,
     handleAddList,

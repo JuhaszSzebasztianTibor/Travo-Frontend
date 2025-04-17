@@ -220,7 +220,7 @@
   list-style: none;
   padding: 0;
   margin: 0 0 10px 0;
-  font-size: 14px;
+  font-size: 16px;
   color: black;
   padding-bottom: 10px;
 }
@@ -268,12 +268,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .destination-column {
   flex: 1;
-  padding: 0 5px;
+  padding: 0 7px;
 }
 
 .destination-name {
@@ -285,14 +285,19 @@
 
 .destination-name h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .date-range {
-  font-size: 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  width: auto;
+  /* prevent flex containers from forcing it smaller */
+  flex-shrink: 0;
   color: #666;
+  font-weight: 600;
   margin-top: 2px;
   line-height: 1.2;
 }

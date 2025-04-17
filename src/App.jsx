@@ -9,6 +9,7 @@ import Profile from "./pages/ProfilePage/ProfilePage.jsx";
 import PlannerPage from "./pages/PlannerPage/PlannerPage.jsx";
 import BudgetPage from "./pages/BudgetPage/BudgetPage.jsx";
 import PackingPage from "./pages/PackingPage/PackingPage.jsx";
+import DayByDayPlanner from "./features/trips/components/planner/DayByDayPlanner.jsx";
 
 function App() {
   return (

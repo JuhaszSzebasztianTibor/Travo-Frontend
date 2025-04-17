@@ -6,9 +6,11 @@ import { usePacking } from "./hooks/usePacking";
 import "./Packing.css";
 
 const iconMap = {
+  Food: "fas fa-hamburger",
   Baby: "fa-baby",
   Beach: "fa-umbrella-beach",
   Business: "fa-briefcase",
+  Essentials: "fas fa-exclamation-circle",
   "Fancy Dinner": "fa-utensils",
 };
 
@@ -31,6 +33,7 @@ const Packing = () => {
     setShowEditModal,
     setEditListName,
     handleAddItem,
+    handleKeyDown,
     handleRemoveItem,
     handleToggleCheck,
     handleAddList,
@@ -91,7 +94,13 @@ const Packing = () => {
             {selectedList}
           </h3>
           <div className="header-actions">
-            <button className="edit-btn" onClick={() => setShowEditModal(true)}>
+            <button
+              className="edit-btn"
+              onClick={() => {
+                setEditListName(selectedList);
+                setShowEditModal(true);
+              }}
+            >
               <i className="fa fa-edit" /> Edit
             </button>
             <button
@@ -140,6 +149,7 @@ const Packing = () => {
             placeholder="Add item..."
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <button onClick={handleAddItem}>➤</button>
         </div>

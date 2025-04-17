@@ -1,0 +1,66 @@
+/* dayByDay.css */
+.day-by-day-tab {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.day-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  background-color: #f8f9fa;
+}
+
+.day-header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.day-date {
+  font-weight: 600;
+  font-size: 18px;
+  color: green;
+  margin-bottom: 0.25rem;
+}
+
+.day-location {
+  font-weight: 600;
+  color: #7f8c8d;
+  font-size: 1rem;
+}
+
+.day-arrow {
+  font-size: 1.2rem;
+  margin-left: 1rem;
+}
+
+.day-details {
+  padding: 1rem;
+  border-top: 1px solid #ecf0f1;
+}
+
+.day-by-day-tab input[type="text"],
+.day-by-day-tab textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+.day-by-day-tab textarea {
+  min-height: 100px;
+  resize: vertical;
+}

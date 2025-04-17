@@ -39,4 +39,12 @@ export const initialLists = {
     { name: "Stroller", quantity: 1 },
     { name: "Toys", quantity: 1 },
   ],
+  Essentials: [
+    { name: "Backpack", quantity: 1 },
+    { name: "Passport / Id", quantity: 1 },
+    { name: "Wallet", quantity: 1 },
+    { name: "Keys", quantity: 1 },
+    { name: "Purse", quantity: 1 },
+  ],
+  Food: [{ name: "Snacks", quantity: 1 }],
 };
