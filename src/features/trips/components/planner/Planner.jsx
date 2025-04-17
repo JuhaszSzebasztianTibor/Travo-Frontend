@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { parseISO, differenceInCalendarDays } from "date-fns";
+
 import { tripData as tripDataFromFile } from "../../data/tripData";
 import { currencySymbolsData } from "../../../../data/currencySymbolsData";
 
@@ -14,6 +15,7 @@ const Planner = () => {
   const [activeTab, setActiveTab] = useState("destinations");
   const [currency, setCurrency] = useState("EUR");
   const [selectedTripId, setSelectedTripId] = useState(1);
+  const [selectedDestinationNights, setSelectedDestinationNights] = useState(0);
   const tripInfo = tripDataFromFile.find((t) => t.id === selectedTripId);
 
   // Manage destinations as state so we can update nights
@@ -45,9 +47,10 @@ const Planner = () => {
     setCurrency(newCurrency);
   };
 
-  const handleActivityClick = (destinationName) => {
-    setSelectedDestination(destinationName); // Set the selected destination
-    setActiveTab("day-by-day"); // Switch to Day-by-Day tab
+  const handleActivityClick = (destinationName, nights) => {
+    setSelectedDestination(destinationName);
+    setActiveTab("day-by-day");
+    setSelectedDestinationNights(nights); // Now `nights` is properly passed
   };
 
   const handleInputChange = (event) => {
@@ -65,12 +68,18 @@ const Planner = () => {
     }
   };
 
-  // Update the filtering logic to support multiple destinations or no filtering
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === "destinations") {
+      setSelectedDestination(null); // Reset the selected destination when switching back to the destinations tab
+    }
+  };
+
+  // Filter the days based on the selected destination
   const filteredDestinations = selectedDestination
     ? destinations.filter((d) => d.name === selectedDestination)
     : destinations;
 
-  // If no destination is selected, we show the full list of destinations
   return (
     <div className="planner-container">
       <div className="left-panel">
@@ -85,19 +94,21 @@ const Planner = () => {
           tripName={tripInfo.tripName}
           startDate={tripInfo.startDate} // pass tripStartDate here
           endDate={tripInfo.endDate}
+          selectedDestination={selectedDestination}
+          selectedDestinationNights={selectedDestinationNights}
         />
 
         <nav className="planner-tabs">
           <ul>
             <li
               className={activeTab === "destinations" ? "active" : ""}
-              onClick={() => setActiveTab("destinations")}
+              onClick={() => handleTabChange("destinations")}
             >
               Destinations
             </li>
             <li
               className={activeTab === "day-by-day" ? "active" : ""}
-              onClick={() => setActiveTab("day-by-day")}
+              onClick={() => handleTabChange("day-by-day")}
             >
               Day by day
             </li>
@@ -109,7 +120,7 @@ const Planner = () => {
             destinations={destinations}
             tripStartDate={tripInfo.startDate}
             onNightsChange={handleNightsChange}
-            onActivityClick={handleActivityClick} // Pass to DestinationRow
+            onActivityClick={handleActivityClick}
             totalNightsPlanned={totalNightsPlanned}
             goal={goal}
           />

@@ -61,7 +61,7 @@ const DestinationList = ({
               startDate={formatDate(start)}
               endDate={formatDate(end)}
               onNightsChange={onNightsChange}
-              onActivityClick={() => onActivityClick(dest.name)} // Make sure the destination name is passed
+              onActivityClick={() => onActivityClick(dest.name, dest.nights)}
               totalNightsPlanned={totalNightsPlanned}
               goal={goal}
             />

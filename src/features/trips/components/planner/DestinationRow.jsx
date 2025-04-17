@@ -68,7 +68,7 @@ const DestinationRow = ({
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            onActivityClick(name); // Pass the name of the destination to the parent
+            onActivityClick(name, nights); // Pass both name and nights
           }}
         >
           {activities > 0 ? (

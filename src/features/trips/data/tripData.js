@@ -1,7 +1,7 @@
 export const tripData = [
   {
     id: 1,
-    tripName: "London",
+    tripName: "Trip to London",
     startDate: "2025-02-28",
     endDate: "2025-03-11",
     destinations: [
