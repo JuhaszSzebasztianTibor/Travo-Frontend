@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { parseISO, differenceInCalendarDays } from "date-fns";
+import { parseISO, differenceInCalendarDays, addDays, format } from "date-fns";
 
 import { tripData as tripDataFromFile } from "../../data/tripData";
 import { currencySymbolsData } from "../../../../data/currencySymbolsData";
@@ -80,6 +80,22 @@ const Planner = () => {
     ? destinations.filter((d) => d.name === selectedDestination)
     : destinations;
 
+  const tripStart = parseISO(tripInfo.startDate);
+  let plannerStartDateISO = tripInfo.startDate;
+
+  if (selectedDestination) {
+    // find its index in the full list
+    const idx = destinations.findIndex((d) => d.name === selectedDestination);
+    // sum nights of everything before it
+    const nightsBefore = destinations
+      .slice(0, idx)
+      .reduce((sum, d) => sum + d.nights, 0);
+    // add that many days to the trip start
+    const plannerStartDate = addDays(tripStart, nightsBefore);
+    // re-format to an ISO-compatible string
+    plannerStartDateISO = format(plannerStartDate, "yyyy-MM-dd");
+  }
+
   return (
     <div className="planner-container">
       <div className="left-panel">
@@ -127,7 +143,7 @@ const Planner = () => {
         ) : (
           <DayByDayPlanner
             destinations={filteredDestinations} // Pass filtered destinations here
-            startDate={tripInfo.startDate}
+            startDate={plannerStartDateISO}
           />
         )}
 
