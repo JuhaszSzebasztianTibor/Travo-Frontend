@@ -9,7 +9,8 @@ import Profile from "./pages/ProfilePage/ProfilePage.jsx";
 import PlannerPage from "./pages/PlannerPage/PlannerPage.jsx";
 import BudgetPage from "./pages/BudgetPage/BudgetPage.jsx";
 import PackingPage from "./pages/PackingPage/PackingPage.jsx";
-import DayByDayPlanner from "./features/trips/components/planner/DayByDayPlanner.jsx";
+import ProtectedRoute from "./utils/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./utils/PublicOnlyRoute.jsx";
 
 function App() {
   return (
@@ -17,18 +18,65 @@ function App() {
       <Routes>
         {/*Main layout*/}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<Profile />}>
-            {/*<Route path="/profile/trip" />*/}
-          </Route>
+          <Route
+            path="/"
+            element={
+              <PublicOnlyRoute>
+                <Home />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PublicOnlyRoute>
+                <Signup />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          ></Route>
         </Route>
 
         <Route element={<PlannerLayout />}>
-          <Route path="/trip/plan" element={<PlannerPage />} />
-          <Route path="/trip/budget" element={<BudgetPage />} />
-          <Route path="/trip/packing" element={<PackingPage />} />
+          <Route
+            path="/trip/plan"
+            element={
+              <ProtectedRoute>
+                <PlannerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip/budget"
+            element={
+              <ProtectedRoute>
+                <BudgetPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip/packing"
+            element={
+              <ProtectedRoute>
+                <PackingPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>

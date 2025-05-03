@@ -1,20 +1,34 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import travoLogo from "../../assets/Images/travo.png";
 import Modal from "../Modal/Modal";
 import CreateTripForm from "../../features/trips/components/modal/CreateTripForm";
+import { isAuthenticated } from "../../utils/auth";
+import { logout } from "../../services/auth/authService";
 
 import "./navbar.css";
 import "../../App.css";
 
 const Navbar = () => {
-  const [isLogedIn, setIsLogedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
   const [isModalOpen, SetIsModalOpen] = useState(false);
 
-  const handleLogout = () => {
-    setIsLogedIn(false);
-  };
+  useEffect(() => {
+    const updateAuthState = () => {
+      setIsLoggedIn(isAuthenticated());
+    };
+
+    // Listen for custom login/logout events
+    window.addEventListener("authChange", updateAuthState);
+
+    // Also catch storage changes (multi-tab logout)
+    window.addEventListener("storage", updateAuthState);
+
+    return () => {
+      window.removeEventListener("authChange", updateAuthState);
+      window.removeEventListener("storage", updateAuthState);
+    };
+  }, []);
 
   return (
     <>
@@ -25,7 +39,7 @@ const Navbar = () => {
             <img src={travoLogo} alt="Travo logo" />
           </Link>
           <ul>
-            {!isLogedIn && (
+            {!isLoggedIn && (
               <li className="highlight-link">
                 <Link to="/about">About</Link>
               </li>
@@ -36,7 +50,7 @@ const Navbar = () => {
         {/* Right Section: Log in & Sign up */}
         <div className="navbar-segment navbar-right">
           <ul>
-            {isLogedIn ? (
+            {isLoggedIn ? (
               <>
                 <li>
                   <button className="nav-btn notification-btn">

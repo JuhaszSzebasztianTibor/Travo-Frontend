@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../services/auth/authService";
 import "./sidebar.css";
 
 const Sidebar = ({ selectedTab, setSelectedTab }) => {
   const [isDropupOpen, setIsDropupOpen] = useState(false); // State to manage dropdown visibility
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   // Toggle dropdown visibility
   const toggleDropup = () => {
@@ -24,10 +35,17 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
     };
   }, []);
 
+  const handleLogout = () => {
+    logout();
+    navigate("/"); // Redirect to login page after logout
+  };
+
   return (
     <div className="sidebar">
       <div className="image-placeholder"></div>
-      <div className="user-name">Jeremy Ghilbert</div>
+      <div className="user-name">
+        {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
+      </div>
       <div className="search-container">
         <input type="text" className="search-bar" placeholder="Search.." />
         <i className="fa fa-search search-icon"></i>
@@ -55,8 +73,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
           </button>
           <div className={`dropup-content ${isDropupOpen ? "show" : ""}`}>
             <a href="#">Profile settings</a>
-            <a href="#">Change password</a>
-            <a href="#">Log out</a>
+            <a onClick={handleLogout}>Log out</a>
           </div>
         </div>
       </div>
