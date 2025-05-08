@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { parseISO, differenceInCalendarDays, addDays, format } from "date-fns";
 
-import { tripData as tripDataFromFile } from "../../data/tripData";
+import { getTripById } from "../../../../services/trips/tripService";
 import { currencySymbolsData } from "../../../../data/currencySymbolsData";
 
 import PlannerHeader from "./PlannerHeader";
@@ -16,19 +17,38 @@ const Planner = () => {
   const [currency, setCurrency] = useState("EUR");
   const [selectedTripId, setSelectedTripId] = useState(1);
   const [selectedDestinationNights, setSelectedDestinationNights] = useState(0);
-  const tripInfo = tripDataFromFile.find((t) => t.id === selectedTripId);
+  //const tripInfo = tripDataFromFile.find((t) => t.id === selectedTripId);
+
+  const { tripId } = useParams();
+  const [tripInfo, setTripInfo] = useState(null);
+  const [destinations, setDestinations] = useState([]);
+
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        const data = await getTripById(tripId);
+        setTripInfo(data);
+        setDestinations(data.destinations || []); // In case it's empty
+      } catch (err) {
+        console.error("Failed to fetch trip data:", err);
+      }
+    };
+
+    fetchTrip();
+  }, [tripId]);
 
   // Manage destinations as state so we can update nights
-  const [destinations, setDestinations] = useState(tripInfo.destinations);
+  //const [destinations, setDestinations] = useState(tripInfo.destinations);
   const [selectedDestination, setSelectedDestination] = useState(null);
 
   // State for the input field
   const [newDestination, setNewDestination] = useState("");
 
-  // Calculate the goal dynamically based on start and end date of the trip
+  if (!tripInfo) return <div>Loading trip data...</div>;
+
   const startDate = parseISO(tripInfo.startDate);
   const endDate = parseISO(tripInfo.endDate);
-  const goal = differenceInCalendarDays(endDate, startDate) + 1; // Add 1 to include the start date itself
+  const goal = differenceInCalendarDays(endDate, startDate) + 1;
 
   const totalNightsPlanned = destinations.reduce((sum, d) => sum + d.nights, 0);
   const progressValue = Math.min(

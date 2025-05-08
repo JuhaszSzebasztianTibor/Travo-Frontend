@@ -1,5 +1,6 @@
-import { tripsData } from "./data/trips";
-import React, { useState, useEffect } from "react";
+// ProfilePage.jsx
+import { useOutletContext } from "react-router-dom";
+import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import useTrips from "../../hooks/useTrips";
 import "../../components/Sidebar/sidebar.css";
@@ -8,22 +9,23 @@ import UpcomingTrips from "./UpcomingTrips";
 import PastTrips from "./PastTrips";
 
 const Profile = () => {
+  const { trips, setTrips } = useOutletContext();
   const [selectedTab, setSelectedTab] = useState("upcoming");
-  const [allTrips, setAllTrips] = useState([]); // To store trips dynamically
+  const { upcomingTrips, pastTrips } = useTrips(trips);
 
-  const trips = tripsData;
+  const handleTripDeleted = (deletedId) => {
+    setTrips((prev) => prev.filter((trip) => trip.id !== deletedId));
+  };
 
-  useEffect(() => {
-    setAllTrips(trips); // Load trips into state
-  }, []);
-
-  const { upcomingTrips, pastTrips } = useTrips(allTrips);
   return (
     <div className="profile-container">
       <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       <div className="profile-content">
-        {selectedTab === "upcoming" && <UpcomingTrips trips={upcomingTrips} />}
-        {selectedTab === "past" && <PastTrips trips={pastTrips} />}
+        {selectedTab === "upcoming" ? (
+          <UpcomingTrips trips={upcomingTrips} onDeleted={handleTripDeleted} />
+        ) : (
+          <PastTrips trips={pastTrips} onDeleted={handleTripDeleted} />
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ export const getCategoryIcon = (category) => {
     case "Transport":
       return "fa-car";
     case "Visit Places":
-      return "fa-map-marker-alt";
+      return "fas fa-university";
     case "Eat & Drinks":
       return "fa-utensils";
     default:

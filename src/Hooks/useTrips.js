@@ -2,16 +2,15 @@
 export default function useTrips(initialTrips) {
   // Sort trips by date
   const sortedTrips = [...initialTrips].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
+    (a, b) => new Date(a.startDate) - new Date(b.startDate)
   );
 
-  // Separate trips into upcoming and past
   const upcomingTrips = sortedTrips.filter(
-    (trip) => new Date(trip.date) > new Date()
+    (trip) => new Date(trip.startDate) > new Date()
   );
 
   const pastTrips = sortedTrips
-    .filter((trip) => new Date(trip.date) < new Date())
+    .filter((trip) => new Date(trip.startDate) < new Date())
     .reverse();
 
   return { upcomingTrips, pastTrips };

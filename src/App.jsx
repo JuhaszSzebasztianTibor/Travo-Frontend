@@ -54,7 +54,7 @@ function App() {
 
         <Route element={<PlannerLayout />}>
           <Route
-            path="/trip/plan"
+            path="/trip/plan/:tripId"
             element={
               <ProtectedRoute>
                 <PlannerPage />
@@ -62,7 +62,7 @@ function App() {
             }
           />
           <Route
-            path="/trip/budget"
+            path="/trip/budget/:tripId"
             element={
               <ProtectedRoute>
                 <BudgetPage />
@@ -70,7 +70,7 @@ function App() {
             }
           />
           <Route
-            path="/trip/packing"
+            path="/trip/packing/:tripId"
             element={
               <ProtectedRoute>
                 <PackingPage />

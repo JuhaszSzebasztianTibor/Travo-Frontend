@@ -2,28 +2,22 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import travoLogo from "../../assets/Images/travo.png";
 import Modal from "../Modal/Modal";
-import CreateTripForm from "../../features/trips/components/modal/CreateTripForm";
+import CreateTripForm from "../../features/profile/modal/CreateTripForm";
 import { isAuthenticated } from "../../utils/auth";
-import { logout } from "../../services/auth/authService";
 
 import "./navbar.css";
 import "../../App.css";
 
-const Navbar = () => {
+const Navbar = ({ onCreateTrip }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
-  const [isModalOpen, SetIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const updateAuthState = () => {
       setIsLoggedIn(isAuthenticated());
     };
-
-    // Listen for custom login/logout events
     window.addEventListener("authChange", updateAuthState);
-
-    // Also catch storage changes (multi-tab logout)
     window.addEventListener("storage", updateAuthState);
-
     return () => {
       window.removeEventListener("authChange", updateAuthState);
       window.removeEventListener("storage", updateAuthState);
@@ -33,21 +27,21 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        {/* Left Section: Logo & About */}
+        {/* Left */}
         <div className="navbar-segment navbar-left">
           <Link to="/" onClick={() => (window.location.href = "/")}>
             <img src={travoLogo} alt="Travo logo" />
           </Link>
-          <ul>
-            {!isLoggedIn && (
+          {!isLoggedIn && (
+            <ul>
               <li className="highlight-link">
                 <Link to="/about">About</Link>
               </li>
-            )}
-          </ul>
+            </ul>
+          )}
         </div>
 
-        {/* Right Section: Log in & Sign up */}
+        {/* Right */}
         <div className="navbar-segment navbar-right">
           <ul>
             {isLoggedIn ? (
@@ -60,7 +54,7 @@ const Navbar = () => {
                 <li>
                   <button
                     className="nav-btn"
-                    onClick={() => SetIsModalOpen(true)}
+                    onClick={() => setIsModalOpen(true)}
                   >
                     <i className="fas fa-plus"></i> Add
                   </button>
@@ -80,8 +74,14 @@ const Navbar = () => {
         </div>
       </nav>
 
-      <Modal isOpen={isModalOpen} onClose={() => SetIsModalOpen(false)}>
-        <CreateTripForm />
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {/* pass the parent callback directly */}
+        <CreateTripForm
+          onSubmit={(tripDto) => {
+            onCreateTrip(tripDto);
+            setIsModalOpen(false);
+          }}
+        />
       </Modal>
     </>
   );

@@ -34,7 +34,8 @@ const PlannerHeader = ({
           )}
         </h1>
         <span>
-          {formattedStart} - {formattedEnd} <i className="fas fa-pen-alt"></i>
+          {formattedStart} - {formattedEnd}{" "}
+          <i className="fas fa-calendar-alt"></i>
         </span>
       </div>
 
