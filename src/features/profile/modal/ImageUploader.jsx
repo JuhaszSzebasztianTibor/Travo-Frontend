@@ -1,37 +1,32 @@
 import React, { useRef } from "react";
 
 const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
-  const fileInputRef = useRef(null); // add a ref
+  const fileInputRef = useRef(null);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0] || null;
-    onFileChange({ target: { files: file ? [file] : [] } });
-    if (file) {
-      onUrlChange({ target: { name: "imageUrl", value: "" } });
-    }
+    // Clear URL when file is selected
+    onFileChange(file);
+    onUrlChange({ target: { name: "imageUrl", value: "" } });
   };
 
   const handleUrlInput = (e) => {
+    // Clear file when URL is entered
     onUrlChange(e);
-    if (e.target.value) {
-      onFileChange({ target: { files: [] } });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = null;
-      }
-    }
+    onFileChange(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleClearFile = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = null; // reset actual input value
-    }
-    onFileChange({ target: { files: [] } });
+    onFileChange(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
     <>
       <h2 className="modal-heading">Image Upload or URL</h2>
       <div className="image-uploader">
+        {/* URL Input */}
         <input
           type="url"
           name="imageUrl"
@@ -40,11 +35,12 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
           placeholder={
             imageFile ? "File selected — URL disabled" : "Enter image URL"
           }
-          disabled={!!imageFile}
           className="image-url-input"
           required
+          disabled={!!imageFile}
         />
 
+        {/* File Upload */}
         <div className={`file-upload-container ${imageFile ? "has-file" : ""}`}>
           <label className="file-upload-label">
             {imageFile ? "File Selected" : "Choose File"}
@@ -52,9 +48,8 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
               type="file"
               accept="image/*"
               onChange={handleFileSelect}
-              disabled={!!imageUrl}
               className="file-upload-input"
-              ref={fileInputRef} // use the ref here
+              ref={fileInputRef}
             />
           </label>
 

@@ -1,13 +1,15 @@
-// CreateTripForm.js
-import React from "react";
 import useTripForm from "../hooks/useTripForm";
 import DateRangePicker from "./DateRangePicker";
 import ImageUploader from "./ImageUploader";
 import "./trip.css";
 
-const CreateTripForm = ({ onSubmit }) => {
+const TripForm = ({
+  onSubmit,
+  initialValues = {},
+  submitLabel = "Start Planning",
+}) => {
   const { tripData, handleChange, handleFileChange, handleSubmit } =
-    useTripForm(onSubmit);
+    useTripForm(onSubmit, initialValues);
 
   return (
     <form onSubmit={handleSubmit} className="trip-form">
@@ -28,13 +30,12 @@ const CreateTripForm = ({ onSubmit }) => {
       />
 
       <h2 className="modal-heading">Trip Description</h2>
-
       <textarea
         name="description"
         value={tripData.description}
         onChange={handleChange}
-        placeholder="Write a short description of your trip..."
         required
+        placeholder="Write a short description of your trip..."
       />
 
       <ImageUploader
@@ -42,17 +43,13 @@ const CreateTripForm = ({ onSubmit }) => {
         imageFile={tripData.imageFile}
         onUrlChange={handleChange}
         onFileChange={handleFileChange}
-        // disable URL input if a file is selected
-        urlDisabled={!!tripData.imageFile}
-        // disable file input if a URL is present
-        fileDisabled={!!tripData.imageUrl}
       />
 
       <button type="submit" className="start-planning-btn">
-        Start Planning
+        {submitLabel}
       </button>
     </form>
   );
 };
 
-export default CreateTripForm;
+export default TripForm;

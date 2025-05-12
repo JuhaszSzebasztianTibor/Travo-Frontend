@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../services/auth/authService";
+import PhotoUploadForm from "../../services/auth/PhotoUploadForm";
 import "./sidebar.css";
 
 const Sidebar = ({ selectedTab, setSelectedTab }) => {
-  const [isDropupOpen, setIsDropupOpen] = useState(false); // State to manage dropdown visibility
+  const [isDropupOpen, setIsDropupOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -27,7 +29,6 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
     }
   };
 
-  // Add event listener to close dropdown when clicking outside
   useEffect(() => {
     document.addEventListener("click", closeDropup);
     return () => {
@@ -37,19 +38,51 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/"); // Redirect to login page after logout
+    navigate("/"); // Redirect to login page
+  };
+
+  const handleUploaded = (newUrl) => {
+    // update state and localStorage
+    setUser((u) => ({ ...u, photoUrl: newUrl }));
+    const stored = JSON.parse(localStorage.getItem("user") || "{}");
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...stored, photoUrl: newUrl })
+    );
   };
 
   return (
     <div className="sidebar">
-      <div className="image-placeholder"></div>
+      <div
+        className="image-placeholder"
+        onClick={() => setModalOpen(true)}
+        style={{
+          backgroundImage: `url(${
+            user?.photoUrl
+              ? `https://localhost:7196${user.photoUrl}?t=${Date.now()}`
+              : "/upload-user.png"
+          })`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          cursor: "pointer",
+        }}
+      />
+
+      <PhotoUploadForm
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onUploaded={handleUploaded}
+      />
+
       <div className="user-name">
         {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
       </div>
+
       <div className="search-container">
         <input type="text" className="search-bar" placeholder="Search.." />
         <i className="fa fa-search search-icon"></i>
       </div>
+
       <div className="sidebar-navigation-menu">
         <button
           onClick={() => setSelectedTab("upcoming")}
@@ -66,6 +99,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
           Past Trips
         </button>
       </div>
+
       <div className="sidebar-bottom-action">
         <div className="dropup">
           <button className="dropbtn" onClick={toggleDropup}>

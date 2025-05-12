@@ -1,8 +1,7 @@
-// src/hooks/useTripForm.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isAuthenticated } from "../../../utils/auth";
 
-export default function useTripForm(onSubmit) {
+export default function useTripForm(onSubmit, initialValues = {}) {
   const [tripData, setTripData] = useState({
     name: "",
     startDate: "",
@@ -12,66 +11,73 @@ export default function useTripForm(onSubmit) {
     imageFile: null,
   });
 
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (initialValues) {
+      setTripData({
+        name: initialValues.name || "",
+        startDate: initialValues.startDate?.slice(0, 10) || "",
+        endDate: initialValues.endDate?.slice(0, 10) || "",
+        description: initialValues.description || "",
+        imageUrl: initialValues.imageUrl || "",
+        imageFile: null,
+      });
+    }
+  }, [JSON.stringify(initialValues)]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTripData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0] || null;
-    setTripData((prev) => ({ ...prev, imageFile: file }));
+  const handleFileChange = (file) => {
+    setTripData((prev) => ({
+      ...prev,
+      imageFile: file,
+      imageUrl: file ? "" : prev.imageUrl,
+    }));
   };
+
+  const validateDates = () => {
+    if (!tripData.startDate || !tripData.endDate) {
+      return "Both start and end dates are required";
+    }
+    if (new Date(tripData.startDate) > new Date(tripData.endDate)) {
+      return "Start date cannot be after end date";
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null);
 
     if (!isAuthenticated()) {
-      alert("You must be logged in to create a trip.");
+      setError("You must be logged in to submit a trip.");
+      setSubmitting(false);
       return;
     }
 
-    if (new Date(tripData.startDate) > new Date(tripData.endDate)) {
-      alert("Start date cannot be after end date");
+    const dateError = validateDates();
+    if (dateError) {
+      setError(dateError);
+      setSubmitting(false);
       return;
     }
-
-    const payload = {
-      name: tripData.name,
-      startDate: tripData.startDate,
-      endDate: tripData.endDate,
-      description: tripData.description,
-      imageFile: tripData.imageFile,
-      imageUrl: tripData.imageUrl,
-    };
 
     try {
-      // Delegate creation (and setTrips) to the onSubmit passed in
-      await onSubmit(payload);
-
-      // Reset form after successful creation
-      setTripData({
-        name: "",
-        startDate: "",
-        endDate: "",
-        description: "",
-        imageUrl: "",
-        imageFile: null,
+      await onSubmit({
+        ...tripData,
+        startDate: tripData.startDate + "T00:00:00",
+        endDate: tripData.endDate + "T23:59:59",
       });
     } catch (err) {
-      const data = err.response?.data;
-      console.error("Full error response:", data);
-
-      if (data?.errors) {
-        console.group("Server validation errors");
-        Object.entries(data.errors).forEach(([field, msgs]) =>
-          console.warn(field, msgs)
-        );
-        console.groupEnd();
-
-        const [firstField, firstMsgs] = Object.entries(data.errors)[0];
-        alert(`${firstField}: ${firstMsgs[0]}`);
-      } else {
-        alert(data?.title || data?.message || "Could not create trip");
-      }
+      setError(err.message || "An unexpected error occurred");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -80,5 +86,7 @@ export default function useTripForm(onSubmit) {
     handleChange,
     handleFileChange,
     handleSubmit,
+    submitting,
+    error,
   };
 }

@@ -14,33 +14,32 @@ const iconMap = {
   "Fancy Dinner": "fa-utensils",
 };
 
-const Packing = () => {
+export default function Packing() {
   const {
     lists,
     selectedList,
     newItem,
-    checkedItems,
     newListName,
     showModal,
-    showDeleteModal,
     showEditModal,
+    showDeleteModal,
     editListName,
     setSelectedList,
     setNewItem,
     setNewListName,
     setShowModal,
-    setShowDeleteModal,
     setShowEditModal,
+    setShowDeleteModal,
     setEditListName,
-    handleAddItem,
-    handleKeyDown,
-    handleRemoveItem,
-    handleToggleCheck,
     handleAddList,
-    handleIncreaseQuantity,
-    handleDecreaseQuantity,
-    handleDeleteList,
     handleRenameList,
+    handleDeleteList,
+    handleAddItem,
+    handleToggleCheck,
+    handleRemoveItem,
+    handleDecreaseQuantity,
+    handleIncreaseQuantity,
+    handleKeyDown,
     checked,
     progress,
   } = usePacking();
@@ -55,16 +54,16 @@ const Packing = () => {
           </button>
         </div>
         <div className="category-grid">
-          {Object.entries(lists).map(([name, items]) => {
-            const checkedCount = checkedItems[name]?.length || 0;
+          {Object.entries(lists).map(([name, listData]) => {
+            const count = listData.items.filter((i) => i.isChecked).length;
             return (
               <div
                 key={name}
                 className={`category-card ${
-                  selectedList === name ? "selected" : ""
+                  selectedList.name === name ? "selected" : ""
                 }`}
                 onClick={() => {
-                  setSelectedList(name);
+                  setSelectedList({ name, id: listData.id });
                   setEditListName(name);
                 }}
               >
@@ -75,7 +74,7 @@ const Packing = () => {
                 />
                 <span>{name}</span>
                 <small>
-                  {checkedCount}/{items.length}
+                  {count}/{listData.items.length}
                 </small>
               </div>
             );
@@ -88,19 +87,13 @@ const Packing = () => {
           <h3>
             <i
               className={`fa ${
-                iconMap[selectedList] || "fa-clipboard-list"
+                iconMap[selectedList.name] || "fa-clipboard-list"
               } fa-fw`}
             />
-            {selectedList}
+            {selectedList.name}
           </h3>
           <div className="header-actions">
-            <button
-              className="edit-btn"
-              onClick={() => {
-                setEditListName(selectedList);
-                setShowEditModal(true);
-              }}
-            >
+            <button className="edit-btn" onClick={() => setShowEditModal(true)}>
               <i className="fa fa-edit" /> Edit
             </button>
             <button
@@ -112,35 +105,34 @@ const Packing = () => {
           </div>
         </div>
         <div className="progress-bar">
-          <div className="progress" style={{ width: `${progress}%` }}></div>
+          <div className="progress" style={{ width: `${progress}%` }} />
         </div>
 
         <ul className="item-list">
-          {lists[selectedList]?.map((item, index) => {
-            const isChecked = checked.includes(index);
-            return (
-              <li key={index} className="item-row">
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => handleToggleCheck(index)}
-                />
-                <span className={isChecked ? "checked" : ""}>{item.name}</span>
-                <span className="quantity">
-                  <button onClick={() => handleDecreaseQuantity(index)}>
-                    -
-                  </button>
-                  <div className="quantity-box">{item.quantity}x</div>
-                  <button onClick={() => handleIncreaseQuantity(index)}>
-                    +
-                  </button>
-                </span>
-                <button onClick={() => handleRemoveItem(index)}>
-                  <i className="fa fa-trash"></i>
+          {lists[selectedList.name]?.items.map((item, index) => (
+            <li key={`${item.id}-${index}`} className="item-row">
+              <input
+                type="checkbox"
+                checked={item.isChecked}
+                onChange={() => handleToggleCheck(item.id, item.isChecked)}
+              />
+              <span className={item.isChecked ? "checked" : ""}>
+                {item.name}
+              </span>
+              <span className="quantity">
+                <button onClick={() => handleDecreaseQuantity(item.id)}>
+                  –
                 </button>
-              </li>
-            );
-          })}
+                <div className="quantity-box">{item.quantity}x</div>
+                <button onClick={() => handleIncreaseQuantity(item.id)}>
+                  +
+                </button>
+              </span>
+              <button onClick={() => handleRemoveItem(item.id)}>
+                <i className="fa fa-trash" />
+              </button>
+            </li>
+          ))}
         </ul>
 
         <div className="add-item-input">
@@ -162,9 +154,6 @@ const Packing = () => {
         setNewListName={setNewListName}
         handleAddList={handleAddList}
       />
-
-      {/* Delete Confirmation Modal */}
-
       <EditListForm
         showModal={showEditModal}
         setShowModal={setShowEditModal}
@@ -172,7 +161,6 @@ const Packing = () => {
         setEditListName={setEditListName}
         handleRenameList={handleRenameList}
       />
-
       <DeleteListForm
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
@@ -181,6 +169,4 @@ const Packing = () => {
       />
     </div>
   );
-};
-
-export default Packing;
+}

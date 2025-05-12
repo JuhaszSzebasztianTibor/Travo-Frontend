@@ -120,8 +120,8 @@
 }
 
 /* Button styles simplified */
-.edit-btn,
-.delete-btn {
+.packing-page .edit-btn,
+.packing-page .delete-btn {
   background: none;
   border: 1px solid #ddd;
   padding: 4px 10px;
@@ -134,8 +134,8 @@
   color: #555;
 }
 
-.edit-btn:hover,
-.delete-btn:hover {
+.packing-page .edit-btn:hover,
+.packing-page .delete-btn:hover {
   background-color: #f0f0f0;
 }
 
@@ -206,8 +206,8 @@
   background-color: #fff;
 }
 
-.decrease-btn,
-.increase-btn {
+.packing-page .decrease-btn,
+.packing-page .increase-btn {
   font-size: 1.5rem !important;
   width: 25px;
   height: 25px;
@@ -219,15 +219,15 @@
   transition: background 0.2s ease;
 }
 
-.fa-trash {
+.packing-page .fa-trash {
   color: #f73f7f;
 }
 
-.fa-trash:hover {
+.packing-page .fa-trash:hover {
   transform: scale(1.2);
 }
 
-.item-row button {
+.packing-page .item-row button {
   background: none;
   border: none;
   color: #888;
@@ -236,7 +236,7 @@
 }
 
 /* Add item input */
-.add-item-input {
+.packing-page .add-item-input {
   display: flex;
   margin-top: 1rem;
   background: #f5f7f9;
@@ -246,7 +246,7 @@
   box-shadow: 0 2px 8px #0000000f;
 }
 
-.add-item-input input {
+.packing-page .add-item-input input {
   flex: 1;
   border: none;
   background: transparent;
@@ -254,11 +254,11 @@
   font-size: 1rem;
 }
 
-.add-item-input input:focus {
+.packing-page.add-item-input input:focus {
   outline: none;
 }
 
-.add-item-input button {
+.packing-page .add-item-input button {
   border: none;
   background: none;
   color: #f73f7f;
@@ -267,25 +267,25 @@
 }
 
 /* Modal */
-.modal-actions {
+.packing-page .modal-actions {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
 
-.confirm-btn {
+.packing-page .confirm-btn {
   background-color: red;
   color: white;
   padding: 6px 12px;
 }
 
-.cancel-btn {
+.packing-page .cancel-btn {
   background-color: #ccc;
   padding: 6px 12px;
 }
 
-.modal-overlay {
+.packing-page .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -298,7 +298,7 @@
   z-index: 999;
 }
 
-.modal {
+.packing-page .modal {
   background: white;
   padding: 2rem;
   border-radius: 10px;

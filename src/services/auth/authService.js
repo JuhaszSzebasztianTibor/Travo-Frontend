@@ -39,9 +39,20 @@ export const login = async (email, password) => {
       });
       throw formatted; // e.g. { email: "...", password: "..." }
     }
-    // Fallback general error:
     throw { general: err.message || "Login failed" };
   }
+};
+
+export const uploadPhotoApi = async (file) => {
+  const formData = new FormData();
+  formData.append("Photo", file);
+
+  const response = await api.post("/User/me/photo", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data.photoUrl;
 };
 
 export const logout = () => {
@@ -49,3 +60,5 @@ export const logout = () => {
   localStorage.removeItem("user");
   window.dispatchEvent(new Event("authChange"));
 };
+
+export const uploadPhoto = uploadPhotoApi;

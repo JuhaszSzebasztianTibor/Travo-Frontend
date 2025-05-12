@@ -12,7 +12,7 @@ const DeleteListForm = ({
   return (
     <div className="packing-modal">
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h3>Are you sure you want to delete "{selectedList}"?</h3>
+        <h3>Are you sure you want to delete "{selectedList.name}"?</h3>
         <div className="packing-modal-form">
           <p>This action cannot be undone.</p>
           <div className="modal-actions-inline">

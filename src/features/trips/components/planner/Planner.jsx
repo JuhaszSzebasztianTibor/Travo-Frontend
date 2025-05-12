@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import mapboxgl from "mapbox-gl";
+import { useParams, useLocation } from "react-router-dom";
 import { parseISO, differenceInCalendarDays, addDays, format } from "date-fns";
 
 import { getTripById } from "../../../../services/trips/tripService";
@@ -8,6 +9,7 @@ import { currencySymbolsData } from "../../../../data/currencySymbolsData";
 import PlannerHeader from "./PlannerHeader";
 import DestinationList from "./DestinationList";
 import DayByDayPlanner from "./DayByDayPlanner";
+import MapView from "./MapView";
 
 import "react-circular-progressbar/dist/styles.css";
 import "./planner.css";
@@ -15,106 +17,126 @@ import "./planner.css";
 const Planner = () => {
   const [activeTab, setActiveTab] = useState("destinations");
   const [currency, setCurrency] = useState("EUR");
-  const [selectedTripId, setSelectedTripId] = useState(1);
-  const [selectedDestinationNights, setSelectedDestinationNights] = useState(0);
-  //const tripInfo = tripDataFromFile.find((t) => t.id === selectedTripId);
-
   const { tripId } = useParams();
+  const location = useLocation();
   const [tripInfo, setTripInfo] = useState(null);
   const [destinations, setDestinations] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [selectedDestinationNights, setSelectedDestinationNights] = useState(0);
+  const [newDestination, setNewDestination] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
+  // Fetch trip data
+  // Update useEffect dependency array
   useEffect(() => {
     const fetchTrip = async () => {
       try {
         const data = await getTripById(tripId);
         setTripInfo(data);
-        setDestinations(data.destinations || []); // In case it's empty
+        setDestinations(data.destinations || []);
       } catch (err) {
         console.error("Failed to fetch trip data:", err);
       }
     };
-
     fetchTrip();
-  }, [tripId]);
+  }, [tripId, location.key]);
 
-  // Manage destinations as state so we can update nights
-  //const [destinations, setDestinations] = useState(tripInfo.destinations);
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  // Autocomplete as user types
+  const handleInputChange = async (e) => {
+    const text = e.target.value;
+    setNewDestination(text);
 
-  // State for the input field
-  const [newDestination, setNewDestination] = useState("");
+    if (text.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          text
+        )}.json?autocomplete=true&limit=5&access_token=${mapboxgl.accessToken}`
+      );
+      const data = await res.json();
+      setSuggestions(
+        data.features.map((f) => ({
+          id: f.id,
+          name: f.place_name,
+          center: f.center,
+        }))
+      );
+    } catch (err) {
+      console.error("Autocomplete error:", err);
+      setSuggestions([]);
+    }
+  };
+
+  // Add destination fallback
+  const handleAddDestination = async () => {
+    if (!newDestination.trim()) return;
+
+    try {
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          newDestination
+        )}.json?access_token=${mapboxgl.accessToken}`
+      );
+      const data = await res.json();
+      if (data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        const placeName = data.features[0].place_name;
+        setDestinations((prev) => [
+          ...prev,
+          { name: placeName, nights: 1, lat, lng },
+        ]);
+        setNewDestination("");
+        setSuggestions([]);
+      }
+    } catch (err) {
+      console.error("Geocoding error:", err);
+      alert("Couldn't find that location. Please try another.");
+    }
+  };
 
   if (!tripInfo) return <div>Loading trip data...</div>;
 
+  // Date calculations
   const startDate = parseISO(tripInfo.startDate);
   const endDate = parseISO(tripInfo.endDate);
   const goal = differenceInCalendarDays(endDate, startDate) + 1;
+  const totalNights = destinations.reduce((sum, d) => sum + d.nights, 0);
+  const progress = Math.min(100, Math.round((totalNights / goal) * 100));
 
-  const totalNightsPlanned = destinations.reduce((sum, d) => sum + d.nights, 0);
-  const progressValue = Math.min(
-    100,
-    Math.round((totalNightsPlanned / goal) * 100)
-  );
-
-  const handleNightsChange = (index, newNights) => {
-    const updated = destinations.map((d, i) =>
-      i === index ? { ...d, nights: newNights } : d
+  const handleNightsChange = (idx, nights) =>
+    setDestinations((dests) =>
+      dests.map((d, i) => (i === idx ? { ...d, nights } : d))
     );
-    setDestinations(updated);
-  };
 
-  const handleCurrencyChange = (newCurrency) => {
-    setCurrency(newCurrency);
-  };
-
-  const handleActivityClick = (destinationName, nights) => {
-    setSelectedDestination(destinationName);
+  const handleActivityClick = (name, nights) => {
+    setSelectedDestination(name);
+    setSelectedDestinationNights(nights);
     setActiveTab("day-by-day");
-    setSelectedDestinationNights(nights); // Now `nights` is properly passed
   };
 
-  const handleInputChange = (event) => {
-    setNewDestination(event.target.value);
-  };
-
-  const handleAddDestination = () => {
-    if (newDestination.trim() !== "") {
-      const newDest = {
-        name: newDestination,
-        nights: 1,
-      };
-      setDestinations((prevDestinations) => [...prevDestinations, newDest]);
-      setNewDestination(""); // Reset the input field
-    }
-  };
-
+  const handleCurrencyChange = (cur) => setCurrency(cur);
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    if (tab === "destinations") {
-      setSelectedDestination(null); // Reset the selected destination when switching back to the destinations tab
-    }
+    if (tab === "destinations") setSelectedDestination(null);
   };
 
-  // Filter the days based on the selected destination
+  // Planner start date for day-by-day
+  let plannerStart = tripInfo.startDate;
+  if (selectedDestination) {
+    const idx = destinations.findIndex((d) => d.name === selectedDestination);
+    const daysBefore = destinations
+      .slice(0, idx)
+      .reduce((sum, d) => sum + d.nights, 0);
+    plannerStart = format(addDays(startDate, daysBefore), "yyyy-MM-dd");
+  }
+
   const filteredDestinations = selectedDestination
     ? destinations.filter((d) => d.name === selectedDestination)
     : destinations;
-
-  const tripStart = parseISO(tripInfo.startDate);
-  let plannerStartDateISO = tripInfo.startDate;
-
-  if (selectedDestination) {
-    // find its index in the full list
-    const idx = destinations.findIndex((d) => d.name === selectedDestination);
-    // sum nights of everything before it
-    const nightsBefore = destinations
-      .slice(0, idx)
-      .reduce((sum, d) => sum + d.nights, 0);
-    // add that many days to the trip start
-    const plannerStartDate = addDays(tripStart, nightsBefore);
-    // re-format to an ISO-compatible string
-    plannerStartDateISO = format(plannerStartDate, "yyyy-MM-dd");
-  }
 
   return (
     <div className="planner-container">
@@ -124,11 +146,11 @@ const Planner = () => {
           currencySymbols={currencySymbolsData}
           amount={100}
           handleCurrencyChange={handleCurrencyChange}
-          nightsPlanned={totalNightsPlanned}
-          progress={progressValue}
+          nightsPlanned={totalNights}
+          progress={progress}
           goal={goal}
           tripName={tripInfo.tripName}
-          startDate={tripInfo.startDate} // pass tripStartDate here
+          startDate={tripInfo.startDate}
           endDate={tripInfo.endDate}
           selectedDestination={selectedDestination}
           selectedDestinationNights={selectedDestinationNights}
@@ -152,46 +174,60 @@ const Planner = () => {
         </nav>
 
         {activeTab === "destinations" ? (
-          <DestinationList
-            destinations={destinations}
-            tripStartDate={tripInfo.startDate}
-            onNightsChange={handleNightsChange}
-            onActivityClick={handleActivityClick}
-            totalNightsPlanned={totalNightsPlanned}
-            goal={goal}
-          />
+          <>
+            <DestinationList
+              destinations={destinations}
+              tripStartDate={tripInfo.startDate}
+              onNightsChange={handleNightsChange}
+              onActivityClick={handleActivityClick}
+              totalNightsPlanned={totalNights}
+              goal={goal}
+            />
+
+            <div
+              className="add-destination-btn"
+              style={{ position: "relative" }}
+            >
+              <input
+                type="text"
+                placeholder="Add new destination..."
+                value={newDestination}
+                onChange={handleInputChange}
+              />
+              <button onClick={handleAddDestination}>➤</button>
+
+              {suggestions.length > 0 && (
+                <ul className="suggestions-list">
+                  {suggestions.map((s) => (
+                    <li
+                      key={s.id}
+                      onClick={() => {
+                        const [lng, lat] = s.center;
+                        setDestinations((prev) => [
+                          ...prev,
+                          { name: s.name, nights: 1, lat, lng },
+                        ]);
+                        setNewDestination("");
+                        setSuggestions([]);
+                      }}
+                    >
+                      {s.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
         ) : (
           <DayByDayPlanner
-            destinations={filteredDestinations} // Pass filtered destinations here
-            startDate={plannerStartDateISO}
+            destinations={filteredDestinations}
+            startDate={plannerStart}
           />
-        )}
-
-        {/* Conditionally render the input and button only in the "destinations" tab */}
-        {activeTab === "destinations" && (
-          <div className="add-destination-container">
-            <input
-              type="text"
-              placeholder="Add new destination..."
-              className="location-search-input search-input"
-              value={newDestination}
-              onChange={handleInputChange}
-            />
-            <button
-              onClick={handleAddDestination}
-              className="add-destination-btn"
-            >
-              Add Destination
-            </button>
-          </div>
         )}
       </div>
 
-      <div className="map-placeholder">
-        <div className="placeholder-content">
-          <span>Map View</span>
-          <p>Map integration placeholder</p>
-        </div>
+      <div className="map-container">
+        <MapView destinations={destinations} startDate={tripInfo.startDate} />
       </div>
     </div>
   );

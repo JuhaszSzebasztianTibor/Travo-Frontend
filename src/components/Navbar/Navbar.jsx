@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import travoLogo from "../../assets/Images/travo.png";
 import Modal from "../Modal/Modal";
-import CreateTripForm from "../../features/profile/modal/CreateTripForm";
+import TripForm from "../../features/profile/modal/TripForm";
 import { isAuthenticated } from "../../utils/auth";
 
 import "./navbar.css";
@@ -76,7 +76,7 @@ const Navbar = ({ onCreateTrip }) => {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {/* pass the parent callback directly */}
-        <CreateTripForm
+        <TripForm
           onSubmit={(tripDto) => {
             onCreateTrip(tripDto);
             setIsModalOpen(false);

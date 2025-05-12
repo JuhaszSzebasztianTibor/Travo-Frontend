@@ -5,7 +5,7 @@ import TripCard from "./TripCard";
 
 export default function UpcomingTrips({ trips, onDeleted }) {
   return (
-    <div>
+    <>
       <h2>Upcoming Trips</h2>
       <div className="trip-cards-container">
         {trips.length > 0 ? (
@@ -22,6 +22,6 @@ export default function UpcomingTrips({ trips, onDeleted }) {
           <p>No upcoming trips</p>
         )}
       </div>
-    </div>
+    </>
   );
 }

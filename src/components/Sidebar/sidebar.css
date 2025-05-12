@@ -8,21 +8,20 @@
   padding: 1rem 1.5rem;
   background-color: #f9fcfd;
   border-right: 1px solid #dde9ed;
+  z-index: 95;
 }
 
 .image-placeholder {
   width: 100px;
   height: 100px;
-  background-color: #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #666;
+  border-radius: 50%;
   border: 3px solid white;
-  border-radius: 50px;
   box-shadow: 2px 3px #00000017;
+  background-color: #ccc;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
 }
-
 .user-name {
   font-family: Poppins, "sans-serif";
   justify-content: center;

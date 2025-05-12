@@ -6,6 +6,7 @@ import "./mainLayout.css";
 
 const MainLayout = () => {
   const [trips, setTrips] = useState([]);
+  const [selectedTrip, setSelectedTrip] = useState(null); // Store selected trip for editing
 
   // load trips once when layout mounts
   useEffect(() => {
@@ -29,7 +30,6 @@ const MainLayout = () => {
   const createTrip = async (dto) => {
     const newTrip = await tripService.createTrip(dto);
 
-    // Normalize the newly created trip too:
     const normalized = {
       id: newTrip.id,
       tripName: newTrip.tripName,
@@ -40,15 +40,22 @@ const MainLayout = () => {
     };
 
     setTrips((prev) => [normalized, ...prev]);
-
     return newTrip;
+  };
+
+  // set selected trip for editing
+  const editTrip = (tripId) => {
+    const tripToEdit = trips.find((t) => t.id === tripId);
+    setSelectedTrip(tripToEdit);
   };
 
   return (
     <>
-      <Navbar onCreateTrip={createTrip} />
+      <Navbar onCreateTrip={createTrip} onEditTrip={editTrip} />
       <main className="main-layout-container">
-        <Outlet context={{ trips, createTrip, setTrips }} />
+        <Outlet
+          context={{ trips, createTrip, editTrip, selectedTrip, setTrips }}
+        />
       </main>
     </>
   );
