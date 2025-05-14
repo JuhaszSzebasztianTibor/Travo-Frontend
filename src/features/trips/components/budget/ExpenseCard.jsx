@@ -1,17 +1,21 @@
-const ExpenseCard = ({ expenses, getCategoryIcon }) => (
+import React from "react";
+
+const ExpenseCard = ({ item, getIcon, onEdit, onDelete }) => (
   <div className="expense-card">
-    <div className="tooltip-wrapper">
-      <i
-        className={`fa ${getCategoryIcon(expenses.category)} expense-icon`}
-      ></i>
-      <span className="tooltip-text">{expenses.category}</span>
-    </div>
+    <i className={`fa ${getIcon(item.category)} expense-icon`} />
+
     <div className="expense-info">
-      <strong>{expenses.name}</strong>
+      <strong>{item.name}</strong>
+      <br />
+      <small>{new Date(item.day).toLocaleDateString()}</small>
     </div>
-    <span className="expense-amount">
-      €{Number(expenses.amount).toFixed(2)}
-    </span>
+
+    <span className="expense-amount">€{item.amount.toFixed(2)}</span>
+
+    <div className="action-icons">
+      <i className="fa fa-edit edit" onClick={() => onEdit(item)} />
+      <i className="fa fa-trash delete" onClick={() => onDelete(item.id)} />
+    </div>
   </div>
 );
 

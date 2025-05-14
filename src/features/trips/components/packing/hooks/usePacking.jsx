@@ -1,307 +1,254 @@
-import React, { useState, useEffect } from "react";
-import * as packingService from "../../../../../services/paking/pakingService.js";
+// src/features/trips/components/packing/hooks/usePacking.jsx
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import * as packingService from "../../../../../services/packing/packingService";
+import { updateLocalItems, normalizeCurrentList } from "./usePackingHelpers";
 
 export function usePacking() {
+  const { tripId } = useParams();
+
+  // --- State ---
   const [lists, setLists] = useState({});
-  const [selectedList, setSelectedList] = useState({ name: null, id: null });
+  const [selectedList, setSelectedList] = useState({ name: "", id: null });
   const [newItem, setNewItem] = useState("");
   const [newListName, setNewListName] = useState("");
   const [editListName, setEditListName] = useState("");
+  const [editIcon, setEditIcon] = useState("");
   const [modals, setModals] = useState({
     add: false,
     edit: false,
     delete: false,
   });
+  const [loading, setLoading] = useState(true);
 
-  // INITIAL LOAD: fetch all lists
+  // --- Load on mount / tripId change ---
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await packingService.fetchPackingLists();
-
+    if (!tripId) return;
+    setLoading(true);
+    packingService
+      .getPackingLists(tripId)
+      .then((data) => {
+        // build map keyed by list.name
         const map = data.reduce((acc, list) => {
           acc[list.name] = {
             id: list.id,
-            category: list.category,
-            items: (list.items || []).map((i) => ({
-              id: i.id, // raw payload already has lowercase `id`
-              name: i.name,
-              quantity: i.quantity, // raw payload has lowercase `quantity`
-              isChecked: i.isChecked ?? false,
-            })),
+            icon: list.packingListIcon,
+            items: Array.isArray(list.items) ? list.items : [],
           };
           return acc;
         }, {});
-
-        console.log("🚀 MAPPED LISTS STATE:", map);
         setLists(map);
 
+        // auto-select first list
         if (data.length) {
-          setSelectedList({ name: data[0].name, id: data[0].id });
+          const first = data[0];
+          setSelectedList({ name: first.name, id: first.id });
+          setEditListName(first.name);
+          setEditIcon(first.packingListIcon);
         }
-      } catch (err) {
-        console.error("Error fetching lists:", err);
-      }
-    })();
-  }, []);
+      })
+      .catch((err) => console.error("Error fetching packing lists:", err))
+      .finally(() => setLoading(false));
+  }, [tripId]);
 
-  // Helper: update items for a given listName
-  function updateLocalItems(listName, updater) {
-    setLists((prev) => {
-      const list = prev[listName];
-      if (!list) return prev;
-      const current = list.items;
-      const next = typeof updater === "function" ? updater(current) : updater;
-      return { ...prev, [listName]: { ...list, items: next } };
-    });
-  }
+  // --- Normalize current list & compute progress ---
+  const { id: selId, items } = normalizeCurrentList(selectedList.name, lists);
+  const checked = items.filter((i) => i.isChecked).length;
+  const progress = items.length ? (checked / items.length) * 100 : 0;
 
-  // ADD ITEM
-  async function handleAddItem() {
-    if (!selectedList.id || !lists[selectedList.name]) return; // <- ADD THIS LINE
+  // --- Item handlers ---
+  const handleAddItem = async () => {
+    if (!selId) return;
     const text = newItem.trim();
     if (!text) return;
 
     const tempId = `temp-${Date.now()}`;
-    const temp = { id: tempId, name: text, quantity: 1, isChecked: false };
-    updateLocalItems(selectedList.name, (old) => [...old, temp]);
+    setLists((prev) =>
+      updateLocalItems(prev, selectedList.name, (old) => [
+        ...old,
+        { id: tempId, name: text, quantity: 1, isChecked: false },
+      ])
+    );
     setNewItem("");
 
     try {
-      const data = await packingService.addItemToPackingList(selectedList.id, {
+      const created = await packingService.addPackingItem(tripId, selId, {
         name: text,
         quantity: 1,
       });
-      updateLocalItems(selectedList.name, (old) =>
-        old.map((i) => (i.id === tempId ? { ...i, id: data.id } : i))
+      setLists((prev) =>
+        updateLocalItems(prev, selectedList.name, (old) =>
+          old.map((i) => (i.id === tempId ? { ...i, id: created.id } : i))
+        )
       );
-    } catch (err) {
-      console.error("Add failed:", err);
-      updateLocalItems(selectedList.name, (old) =>
-        old.filter((i) => i.id !== tempId)
+    } catch {
+      setLists((prev) =>
+        updateLocalItems(prev, selectedList.name, (old) =>
+          old.filter((i) => i.id !== tempId)
+        )
       );
     }
-  }
+  };
 
-  // TOGGLE CHECK
-  async function handleToggleCheck(itemId, checked) {
-    console.log("🔍 handleToggleCheck called with", {
-      selectedList,
-      itemId,
-      listsForSelected: lists[selectedList.name],
-    });
-
-    if (!selectedList.id) return;
-    const list = lists[selectedList.name];
-    if (!list) return;
-    const isTemp = String(itemId).startsWith("temp-");
-
-    updateLocalItems(
-      selectedList.name,
-      list.items.map((i) =>
-        i.id === itemId ? { ...i, isChecked: !checked } : i
+  const handleToggleCheck = async (itemId, wasChecked) => {
+    setLists((prev) =>
+      updateLocalItems(prev, selectedList.name, (old) =>
+        old.map((i) => (i.id === itemId ? { ...i, isChecked: !wasChecked } : i))
       )
     );
-    if (isTemp) return;
+    if (`${itemId}`.startsWith("temp-")) return;
 
+    const item = items.find((i) => i.id === itemId);
+    if (!item) return;
     try {
-      const item = list.items.find((i) => i.id === itemId);
-      await packingService.updateItemInPackingList(selectedList.id, itemId, {
+      await packingService.updatePackingItem(tripId, selId, itemId, {
         ...item,
-        isChecked: !checked,
+        isChecked: !wasChecked,
       });
-    } catch (err) {
-      console.error("Toggle failed:", err);
-      updateLocalItems(selectedList.name, list.items);
+    } catch {
+      // rollback
+      setLists((prev) =>
+        updateLocalItems(prev, selectedList.name, () => items)
+      );
     }
-  }
+  };
 
-  // CHANGE QUANTITY
-  async function handleChangeQuantity(itemId, qty) {
-    console.log("🔍 handleChangeQuantity called with", {
-      selectedList,
-      itemId,
-      qty,
-      listsForSelected: lists[selectedList.name],
-    });
-
-    if (!selectedList.id) return;
-    const list = lists[selectedList.name];
-    if (!list) return;
-    const isTemp = String(itemId).startsWith("temp-");
-    const prev = list.items;
-
-    updateLocalItems(
-      selectedList.name,
-      prev.map((i) => (i.id === itemId ? { ...i, quantity: qty } : i))
+  const handleChangeQuantity = async (itemId, qty) => {
+    setLists((prev) =>
+      updateLocalItems(prev, selectedList.name, (old) =>
+        old.map((i) => (i.id === itemId ? { ...i, quantity: qty } : i))
+      )
     );
-    if (isTemp) return;
+    if (`${itemId}`.startsWith("temp-")) return;
 
+    const item = items.find((i) => i.id === itemId);
+    if (!item) return;
     try {
-      const item = list.items.find((i) => i.id === itemId);
-      await packingService.updateItemInPackingList(selectedList.id, itemId, {
+      await packingService.updatePackingItem(tripId, selId, itemId, {
         ...item,
         quantity: qty,
       });
-    } catch (err) {
-      console.error("Quantity failed:", err);
-      updateLocalItems(selectedList.name, prev);
+    } catch {
+      setLists((prev) =>
+        updateLocalItems(prev, selectedList.name, () => items)
+      );
     }
-  }
-  const handleDecreaseQuantity = (id) => {
-    const list = lists[selectedList.name];
-    const item = list?.items.find((i) => i.id === id);
-    if (item) handleChangeQuantity(id, Math.max(1, item.quantity - 1));
-  };
-  const handleIncreaseQuantity = (id) => {
-    const list = lists[selectedList.name];
-    const item = list?.items.find((i) => i.id === id);
-    if (item) handleChangeQuantity(id, item.quantity + 1);
   };
 
-  // REMOVE ITEM
-  async function handleRemoveItem(itemId) {
-    if (!selectedList.id) return;
-    const list = lists[selectedList.name];
-    if (!list) return;
-    const prev = list.items;
-
-    updateLocalItems(
-      selectedList.name,
-      prev.filter((i) => i.id !== itemId)
+  const handleDecreaseQuantity = (id) =>
+    handleChangeQuantity(
+      id,
+      Math.max(1, (items.find((i) => i.id === id)?.quantity || 1) - 1)
     );
-    const numeric = Number(itemId);
-    if (isNaN(numeric)) return;
 
-    try {
-      await packingService.removeItemFromPackingList(selectedList.id, numeric);
-    } catch (err) {
-      console.error("Remove failed:", err);
-      updateLocalItems(selectedList.name, prev);
+  const handleIncreaseQuantity = (id) =>
+    handleChangeQuantity(
+      id,
+      (items.find((i) => i.id === id)?.quantity || 0) + 1
+    );
+
+  const handleRemoveItem = async (itemId) => {
+    const snapshot = items;
+    setLists((prev) =>
+      updateLocalItems(prev, selectedList.name, (old) =>
+        old.filter((i) => i.id !== itemId)
+      )
+    );
+    if (!`${itemId}`.startsWith("temp-")) {
+      try {
+        await packingService.removePackingItem(tripId, selId, itemId);
+      } catch {
+        setLists((prev) =>
+          updateLocalItems(prev, selectedList.name, () => snapshot)
+        );
+      }
     }
-  }
+  };
 
-  // LIST CRUD
-  async function handleAddList() {
-    const name = newListName.trim();
-    if (!name || lists[name]) return;
-
-    try {
-      // 1. Create on the server
-      const created = await packingService.createPackingList({
-        name,
-        category: 0,
-        items: [],
-      });
-
-      // 2. Normalize new-list shape just like in your initial fetch
-      const normalized = {
+  // --- List handlers (unchanged) ---
+  const handleAddList = async ({ name, icon, items: tpl = [] }) => {
+    if (!name || !icon || lists[name]) return;
+    const created = await packingService.createPackingList(tripId, {
+      name,
+      packingListIcon: icon,
+      items: tpl,
+    });
+    setLists((prev) => ({
+      ...prev,
+      [created.name]: {
         id: created.id,
-        category: created.category,
-        items: (created.items || []).map((i) => ({
-          id: i.id,
-          name: i.name,
-          quantity: i.quantity,
-          isChecked: !!i.isChecked,
-        })),
-      };
+        icon: created.packingListIcon,
+        items: created.items || [],
+      },
+    }));
+    setSelectedList({ name: created.name, id: created.id });
+    setNewListName("");
+    setModals((m) => ({ ...m, add: false }));
+  };
 
-      // 3. Merge into state
-      setLists((prev) => ({
-        ...prev,
-        [created.name]: normalized,
-      }));
+  const handleRenameList = async ({ name, icon }) => {
+    if (name === selectedList.name) return;
+    const dto = {
+      id: selectedList.id,
+      Name: name,
+      PackingListIcon: icon,
+      Items: items,
+    };
+    await packingService.renamePackingList(tripId, selectedList.id, dto);
+    setLists((prev) => {
+      const copy = { ...prev };
+      delete copy[selectedList.name];
+      copy[name] = { id: selectedList.id, icon, items: dto.Items };
+      return copy;
+    });
+    setSelectedList({ name, id: selectedList.id });
+    setModals((m) => ({ ...m, edit: false }));
+  };
 
-      // 4. Select & prime edit field
-      setSelectedList({ name: created.name, id: created.id });
-      setEditListName(created.name);
-
-      // 5. Tidy up
-      setNewListName("");
-      setModals((m) => ({ ...m, add: false }));
-    } catch (err) {
-      console.error("Create list failed:", err);
-    }
-  }
-
-  async function handleRenameList() {
-    const trimmed = editListName.trim();
-    if (!trimmed || trimmed === selectedList.name) return;
-    try {
-      const list = lists[selectedList.name];
-      const dto = {
-        id: list.id,
-        name: trimmed,
-        category: list.category || 0,
-        items: list.items,
-      };
-      await packingService.renamePackingList(list.id, dto);
-      setLists((prev) => {
-        const copy = { ...prev };
-        delete copy[selectedList.name];
-        return {
-          ...copy,
-          [trimmed]: { ...list, items: list.items, category: list.category },
-        };
-      });
-      setSelectedList({ name: trimmed, id: list.id });
-      setEditListName("");
-      setModals((m) => ({ ...m, edit: false }));
-    } catch (err) {
-      console.error("Rename failed:", err);
-    }
-  }
-
-  async function handleDeleteList() {
-    if (!selectedList.id) return;
-    try {
-      await packingService.deletePackingList(selectedList.id);
-      const next = { ...lists };
-      delete next[selectedList.name];
-      const names = Object.keys(next);
-      const newSel = names.length
-        ? { name: names[0], id: next[names[0]].id }
-        : { name: null, id: null };
-      setLists(next);
-      setSelectedList(newSel);
-      setModals((m) => ({ ...m, delete: false }));
-    } catch (err) {
-      console.error("Delete failed:", err);
-    }
-  }
-
-  // Derived
-  const items = lists[selectedList.name]?.items || [];
-  const checkedCount = items.filter((i) => i.isChecked).length;
-  const progress = items.length ? (checkedCount / items.length) * 100 : 0;
+  const handleDeleteList = async () => {
+    await packingService.deletePackingList(tripId, selectedList.id);
+    const next = { ...lists };
+    delete next[selectedList.name];
+    const keys = Object.keys(next);
+    setSelectedList(
+      keys.length
+        ? { name: keys[0], id: next[keys[0]].id }
+        : { name: "", id: null }
+    );
+    setLists(next);
+    setModals((m) => ({ ...m, delete: false }));
+  };
 
   return {
+    loading,
     lists,
     selectedList,
-    setSelectedList,
     newItem,
-    setNewItem,
     newListName,
-    setNewListName,
     editListName,
+    editIcon,
+    setSelectedList,
+    setNewItem,
+    setNewListName,
     setEditListName,
+    setEditIcon,
     showModal: modals.add,
     showEditModal: modals.edit,
     showDeleteModal: modals.delete,
-    setShowModal: (s) => setModals((m) => ({ ...m, add: s })),
-    setShowEditModal: (s) => setModals((m) => ({ ...m, edit: s })),
-    setShowDeleteModal: (s) => setModals((m) => ({ ...m, delete: s })),
+    setShowModal: (v) => setModals((m) => ({ ...m, add: v })),
+    setShowEditModal: (v) => setModals((m) => ({ ...m, edit: v })),
+    setShowDeleteModal: (v) => setModals((m) => ({ ...m, delete: v })),
     handleAddList,
     handleRenameList,
     handleDeleteList,
     handleAddItem,
     handleToggleCheck,
-    handleRemoveItem,
+    handleChangeQuantity,
     handleDecreaseQuantity,
     handleIncreaseQuantity,
-    handleChangeQuantity,
+    handleRemoveItem,
     handleKeyDown: (e) => e.key === "Enter" && handleAddItem(),
-    checked: checkedCount,
+    checked,
     progress,
   };
 }

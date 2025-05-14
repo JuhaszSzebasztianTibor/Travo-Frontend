@@ -1,52 +1,62 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
-import * as tripService from "../../services/trips/tripService";
-import "./mainLayout.css";
+import { isAuthenticated } from "../../utils/auth";
+import {
+  getMyTrips,
+  createTrip as createTripService,
+} from "../../services/trips/tripService";
 
-const MainLayout = () => {
+export default function MainLayout() {
   const [trips, setTrips] = useState([]);
-  const [selectedTrip, setSelectedTrip] = useState(null); // Store selected trip for editing
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [auth, setAuth] = useState(isAuthenticated());
 
-  // load trips once when layout mounts
-  useEffect(() => {
-    tripService
-      .getAllTrips()
-      .then((rawTrips) => {
-        const normalized = rawTrips.map((t) => ({
-          id: t.id,
-          tripName: t.tripName,
-          startDate: t.startDate,
-          endDate: t.endDate,
-          description: t.description,
-          imageUrl: t.image,
-        }));
-        setTrips(normalized);
-      })
-      .catch(console.error);
+  // wrap the fetch in useCallback so we can call it repeatedly
+  const loadTrips = useCallback(async () => {
+    if (!isAuthenticated()) {
+      setTrips([]);
+      return;
+    }
+    try {
+      const raw = await getMyTrips();
+      const normalized = raw.map((t) => ({
+        id: t.id,
+        tripName: t.tripName,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        description: t.description,
+        imageUrl: t.image,
+      }));
+      setTrips(normalized);
+    } catch (err) {
+      console.error("Failed to load trips:", err);
+      setTrips([]);
+    }
   }, []);
 
-  // create new trip and prepend to trips
-  const createTrip = async (dto) => {
-    const newTrip = await tripService.createTrip(dto);
-
-    const normalized = {
-      id: newTrip.id,
-      tripName: newTrip.tripName,
-      startDate: newTrip.startDate,
-      endDate: newTrip.endDate,
-      description: newTrip.description,
-      imageUrl: newTrip.image,
+  // 1) initial load, 2) reload on auth changes
+  useEffect(() => {
+    loadTrips();
+    const onAuth = () => {
+      setAuth(isAuthenticated());
+      loadTrips();
     };
+    window.addEventListener("authChange", onAuth);
+    return () => window.removeEventListener("authChange", onAuth);
+  }, [loadTrips]);
 
-    setTrips((prev) => [normalized, ...prev]);
+  // createTrip now reloads automatically after success
+  const createTrip = async (dto) => {
+    const newTrip = await createTripService(dto);
+    await loadTrips();
     return newTrip;
   };
 
-  // set selected trip for editing
+  // you already remove trips on delete via outlet context's onDeleted
+
   const editTrip = (tripId) => {
-    const tripToEdit = trips.find((t) => t.id === tripId);
-    setSelectedTrip(tripToEdit);
+    setSelectedTrip(trips.find((t) => t.id === tripId) || null);
   };
 
   return (
@@ -59,6 +69,4 @@ const MainLayout = () => {
       </main>
     </>
   );
-};
-
-export default MainLayout;
+}

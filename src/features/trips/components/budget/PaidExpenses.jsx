@@ -1,33 +1,43 @@
+import React from "react";
 import ExpenseGroup from "./ExpenseGroup";
 
-const PaidExpenses = ({ expenses, onAddClick, getCategoryIcon }) => {
-  const grouped = groupByDate(expenses.filter((e) => e.status === "Paid"));
+const groupByDate = (items) =>
+  items.reduce((acc, cur) => {
+    const day = cur.day.split("T")[0];
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(cur);
+    return acc;
+  }, {});
+
+/**
+ * Renders all “Paid” items, grouped by date,
+ * with Add / Edit / Delete handlers.
+ */
+const PaidExpenses = ({ items, onAdd, onEdit, onDelete, getIcon }) => {
+  const paidItems = items.filter((i) => i.status === "Paid");
+  const grouped = groupByDate(paidItems);
 
   return (
     <div className="left-panel">
       <div className="budget-header">
-        <h2>Paid Expenses</h2>
-        <button className="budget-add-btn" onClick={onAddClick}>
-          <i className="fa fa-plus-circle"></i> Add Expense
+        <h2>Paid</h2>
+        <button onClick={onAdd} className="budget-add-btn">
+          <i className="fa fa-plus-circle" /> Add Expense
         </button>
       </div>
-      {Object.entries(grouped).map(([date, exps]) => (
+
+      {Object.entries(grouped).map(([day, list]) => (
         <ExpenseGroup
-          key={date}
-          date={date}
-          expenses={exps}
-          getCategoryIcon={getCategoryIcon}
+          key={day}
+          day={day}
+          items={list}
+          getIcon={getIcon}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>
   );
 };
-
-const groupByDate = (arr) =>
-  arr.reduce((acc, curr) => {
-    acc[curr.day] = acc[curr.day] || [];
-    acc[curr.day].push(curr);
-    return acc;
-  }, {});
 
 export default PaidExpenses;

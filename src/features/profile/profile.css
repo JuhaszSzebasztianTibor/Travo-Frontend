@@ -90,3 +90,21 @@
 .trip-card:hover .delete-btn {
   opacity: 1;
 }
+
+.delete-modal-action {
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+}
+
+.delete-modal-action .confirm-btn,
+.delete-modal-action .cancel-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: green;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}

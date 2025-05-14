@@ -49,36 +49,4 @@ export const tripsData = [
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
   },
-  {
-    id: 7,
-    destination: "Oradea",
-    date: "2024-11-09",
-    description: "A great time exploring Oradea",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
-  },
-  {
-    id: 8,
-    destination: "Oradea",
-    date: "2024-11-09",
-    description: "A great time exploring Oradea",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
-  },
-  {
-    id: 9,
-    destination: "Oradea",
-    date: "2024-11-09",
-    description: "A great time exploring Oradea",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
-  },
-  {
-    id: 10,
-    destination: "Oradea",
-    date: "2024-11-09",
-    description: "A great time exploring Oradea",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5ls51yzeRVsVZC1XeASpgBb42ah-Gk-Ukiw&s",
-  },
 ];

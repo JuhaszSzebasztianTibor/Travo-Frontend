@@ -9,15 +9,7 @@ export default function UpcomingTrips({ trips, onDeleted }) {
       <h2>Past Trips</h2>
       <div className="trip-cards-container">
         {trips.length > 0 ? (
-          trips.map((trip) => (
-            <Link
-              key={trip.id}
-              to={`/trip/plan/${trip.id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <TripCard trip={trip} onDeleted={onDeleted} />
-            </Link>
-          ))
+          trips.map((trip) => <TripCard trip={trip} onDeleted={onDeleted} />)
         ) : (
           <p>No upcoming trips</p>
         )}

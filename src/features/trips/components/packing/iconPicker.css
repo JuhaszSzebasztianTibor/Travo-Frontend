@@ -1,0 +1,43 @@
+/* Scrollable wrapper around the icon picker */
+.icon-picker-container {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* Icon grid */
+.icon-picker-container .icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
+}
+
+/* Icon button default */
+.icon-picker-container .icon-btn {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: black;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+/* Icon button hover */
+.icon-picker-container .icon-btn:hover {
+  border-color: #999;
+  background: #f9fafb;
+}
+
+/* Icon button selected state */
+.icon-picker-container .icon-btn.selected {
+  border-color: #f73f7f;
+  background: #f6dce6;
+}

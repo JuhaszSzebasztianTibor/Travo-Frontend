@@ -1,36 +1,29 @@
 import React from "react";
-import AddListForm from "./AddListForm";
-import EditListForm from "./EditListForm";
+import { PackingListForm } from "./PackingListForm";
 import DeleteListForm from "./DeleteListForm";
 import { usePacking } from "./hooks/usePacking";
 import "./Packing.css";
 
-const iconMap = {
-  Food: "fas fa-hamburger",
-  Baby: "fa-baby",
-  Beach: "fa-umbrella-beach",
-  Business: "fa-briefcase",
-  Essentials: "fas fa-exclamation-circle",
-  "Fancy Dinner": "fa-utensils",
-};
-
 export default function Packing() {
   const {
+    loading,
     lists,
     selectedList,
     newItem,
     newListName,
+    setNewListName,
     showModal,
     showEditModal,
     showDeleteModal,
     editListName,
+    editIcon,
     setSelectedList,
     setNewItem,
-    setNewListName,
     setShowModal,
     setShowEditModal,
     setShowDeleteModal,
     setEditListName,
+    setEditIcon,
     handleAddList,
     handleRenameList,
     handleDeleteList,
@@ -44,41 +37,58 @@ export default function Packing() {
     progress,
   } = usePacking();
 
+  if (loading) {
+    return <div className="packing-loading">Loading packing lists…</div>;
+  }
+
+  if (!selectedList.name || !lists[selectedList.name]) {
+    return (
+      <div className="packing-loading">
+        No packing list selected or data missing.
+      </div>
+    );
+  }
+
+  const sidebarEntries = Object.entries(lists).map(([name, data]) => {
+    const arr = Array.isArray(data.items) ? data.items : [];
+    const cnt = arr.filter((i) => i.isChecked).length;
+    return { name, data, count: cnt, total: arr.length };
+  });
+
+  const items = Array.isArray(lists[selectedList.name]?.items)
+    ? lists[selectedList.name].items
+    : [];
+
   return (
     <div className="packing-page">
       <div className="packing-sidebar">
         <div className="packing-title">
           <h2>Packing list</h2>
           <button className="add-list-btn" onClick={() => setShowModal(true)}>
-            <i className="fa fa-plus-circle"></i> Add list
+            <i className="fa fa-plus-circle" /> Add list
           </button>
         </div>
         <div className="category-grid">
-          {Object.entries(lists).map(([name, listData]) => {
-            const count = listData.items.filter((i) => i.isChecked).length;
-            return (
-              <div
-                key={name}
-                className={`category-card ${
-                  selectedList.name === name ? "selected" : ""
-                }`}
-                onClick={() => {
-                  setSelectedList({ name, id: listData.id });
-                  setEditListName(name);
-                }}
-              >
-                <i
-                  className={`fa ${
-                    iconMap[name] || "fas fa-clipboard-list"
-                  } fa-2x`}
-                />
-                <span>{name}</span>
-                <small>
-                  {count}/{listData.items.length}
-                </small>
-              </div>
-            );
-          })}
+          {sidebarEntries.map(({ name, data, count, total }) => (
+            <div
+              key={name}
+              className={`category-card ${
+                selectedList.name === name ? "selected" : ""
+              }`}
+              onClick={() => {
+                if (!data?.id) return;
+                setSelectedList({ name, id: data.id });
+                setEditListName(name);
+                setEditIcon(data.icon);
+              }}
+            >
+              <i className={`${data.icon} fa-2x`} />
+              <span>{name}</span>
+              <small>
+                {count}/{total}
+              </small>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -86,8 +96,8 @@ export default function Packing() {
         <div className="header">
           <h3>
             <i
-              className={`fa ${
-                iconMap[selectedList.name] || "fa-clipboard-list"
+              className={`${
+                lists[selectedList.name]?.icon || "fas fa-clipboard-list"
               } fa-fw`}
             />
             {selectedList.name}
@@ -104,41 +114,45 @@ export default function Packing() {
             </button>
           </div>
         </div>
+
         <div className="progress-bar">
           <div className="progress" style={{ width: `${progress}%` }} />
         </div>
 
         <ul className="item-list">
-          {lists[selectedList.name]?.items.map((item, index) => (
-            <li key={`${item.id}-${index}`} className="item-row">
-              <input
-                type="checkbox"
-                checked={item.isChecked}
-                onChange={() => handleToggleCheck(item.id, item.isChecked)}
-              />
-              <span className={item.isChecked ? "checked" : ""}>
-                {item.name}
-              </span>
-              <span className="quantity">
-                <button onClick={() => handleDecreaseQuantity(item.id)}>
-                  –
+          {items.map((item, idx) => {
+            if (!item || !item.id) return null;
+            return (
+              <li key={`${item.id}-${idx}`} className="item-row">
+                <input
+                  type="checkbox"
+                  checked={item.isChecked}
+                  onChange={() => handleToggleCheck(item.id, item.isChecked)}
+                />
+                <span className={item.isChecked ? "checked" : ""}>
+                  {item.name}
+                </span>
+                <span className="quantity">
+                  <button onClick={() => handleDecreaseQuantity(item.id)}>
+                    –
+                  </button>
+                  <div className="quantity-box">{item.quantity}x</div>
+                  <button onClick={() => handleIncreaseQuantity(item.id)}>
+                    +
+                  </button>
+                </span>
+                <button onClick={() => handleRemoveItem(item.id)}>
+                  <i className="fa fa-trash" />
                 </button>
-                <div className="quantity-box">{item.quantity}x</div>
-                <button onClick={() => handleIncreaseQuantity(item.id)}>
-                  +
-                </button>
-              </span>
-              <button onClick={() => handleRemoveItem(item.id)}>
-                <i className="fa fa-trash" />
-              </button>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
 
         <div className="add-item-input">
           <input
             type="text"
-            placeholder="Add item..."
+            placeholder="Add item…"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -147,25 +161,30 @@ export default function Packing() {
         </div>
       </div>
 
-      <AddListForm
-        showModal={showModal}
-        setShowModal={setShowModal}
-        newListName={newListName}
-        setNewListName={setNewListName}
-        handleAddList={handleAddList}
+      <PackingListForm
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        mode="create"
+        initialName={newListName}
+        initialIcon=""
+        onSubmit={handleAddList}
       />
-      <EditListForm
-        showModal={showEditModal}
-        setShowModal={setShowEditModal}
-        editListName={editListName}
-        setEditListName={setEditListName}
-        handleRenameList={handleRenameList}
+      <PackingListForm
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        mode="edit"
+        initialName={editListName}
+        initialIcon={editIcon}
+        onSubmit={handleRenameList}
       />
       <DeleteListForm
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
         selectedList={selectedList}
-        handleDeleteList={handleDeleteList}
+        handleDeleteList={() => {
+          handleDeleteList();
+          setShowDeleteModal(false);
+        }}
       />
     </div>
   );

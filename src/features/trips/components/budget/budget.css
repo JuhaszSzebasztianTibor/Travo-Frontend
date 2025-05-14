@@ -1,20 +1,15 @@
+/* Container & Layout */
 .budget-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* cleaner */
-  gap: 2rem; /* tighter spacing */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
   padding: 2rem;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-.budget-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
+/* Panel Styling (all white) */
 .budget-container .left-panel,
 .budget-container .middle-panel,
 .budget-container .right-panel {
@@ -25,6 +20,13 @@
   overflow: auto;
 }
 
+/* Header & Add Button */
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 .budget-add-btn {
   background-color: darkgreen;
   color: white;
@@ -33,17 +35,24 @@
   border-radius: 50px;
   cursor: pointer;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
 }
-
 .budget-add-btn i {
   margin-right: 6px;
 }
+.budget-add-btn:hover {
+  color: green;
+  background-color: white;
+  border-color: green;
+}
 
+/* Expense Group & Card */
 .expense-date-group {
   margin-bottom: 1.5rem;
 }
-
 .expense-card {
+  position: relative; /* for absolute icons */
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -51,13 +60,64 @@
   border: 1px solid #eee;
   border-radius: 10px;
   margin-top: 0.5rem;
+  background-color: #fff;
+  overflow: visible;
 }
 
+/* Icons & Info */
+.expense-icon {
+  font-size: 1.5rem;
+  color: darkgreen;
+  width: 24px;
+}
+.expense-info {
+  flex-grow: 1;
+}
+
+/* Amount & Action Buttons */
+/* amount sits at far right, no extra margin */
+.expense-amount {
+  margin-left: auto;
+  display: inline-block;
+  font-weight: bold;
+  color: #333;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* absolutely position the icons on the right edge */
+.action-icons {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.action-icons i {
+  cursor: pointer;
+}
+.action-icons .edit {
+  color: #e0c200;
+}
+.action-icons .delete {
+  color: #d33a3a;
+}
+
+/* On CARD hover: slide amount left + reveal icons */
+.expense-card:hover .expense-amount {
+  transform: translateX(-50px);
+}
+.expense-card:hover .action-icons {
+  opacity: 1;
+}
+
+/* Tooltip (if used) */
 .tooltip-wrapper {
   position: relative;
   display: inline-block;
 }
-
 .tooltip-text {
   visibility: hidden;
   width: 100px;
@@ -67,43 +127,24 @@
   font-weight: bold;
   border: 1px solid darkgreen;
   padding: 5px 0;
-
-  /* Position the tooltip */
   position: absolute;
   z-index: 1;
   top: 120%;
   left: 90%;
   margin-left: -60px;
 }
-
 .tooltip-wrapper:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
 }
 
-.expense-icon {
-  font-size: 1.5rem;
-  color: darkgreen;
-  width: 24px;
-}
-
-.expense-info {
-  flex-grow: 1;
-}
-
-.expense-amount {
-  font-weight: bold;
-  color: #333;
-}
-
-/* Updated and cleaned up progress bar container */
+/* Summary Panel */
 .circle-progressbar-container {
   position: relative;
-  width: 180px; /* Size of the circle */
+  width: 180px;
   height: 180px;
-  margin-bottom: 10px; /* Space between the circle and the total cost text */
+  margin-bottom: 10px;
 }
-
 .progress-text {
   position: absolute;
   top: 50%;
@@ -113,96 +154,75 @@
   font-size: 20px;
   color: #333;
 }
-
 .summary-total {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers content horizontally */
-  justify-content: center;
+  align-items: center;
   text-align: center;
 }
-
 .summary-total h2 {
   margin: 0;
   color: #333;
 }
-
 .summary-total p {
   margin: 0;
   font-size: medium;
   color: #888;
 }
-
 .summary-breakdown {
   display: flex;
-  justify-content: center; /* centers the items horizontally */
+  justify-content: center;
   font-size: 1.1rem;
   color: #333;
-  margin: 20px auto 0 auto; /* adds top margin and auto horizontal margins */
-  gap: 60px; /* space between the items; adjust as needed */
+  margin: 20px auto 0;
+  gap: 60px;
 }
-
 .status {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
-
 .status-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Adjust gap as needed */
+  gap: 0.5rem;
 }
-
-/* Dot styling */
 .status .dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #ccc; /* Default dot color */
+  background-color: #ccc;
   display: inline-block;
 }
-
-/* Override the dot color for each status */
 .status.paid .dot {
-  background-color: #4caf50;
+  background-color: #007700;
 }
-
 .status.pending .dot {
   background-color: #f0f0f0;
 }
-
 .status p {
   margin: 0;
 }
 
-.total {
-  font-size: 1.2rem;
-  padding-left: 15px;
-  margin-top: 0.5rem; /* Space between label line and total amount */
-}
-
+/* Category Summary */
 .category-summary {
   margin-top: 3rem;
-  text-align: center; /* Centers the overall container including the header */
+  text-align: center;
 }
-
-/* This container will be centered but its content will align left */
 .category-items {
   display: inline-block;
   text-align: left;
 }
-
 .category-card {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 0.75rem;
 }
-
-.budget-add-btn:hover {
-  color: green;
-  background-color: white;
-  border-color: green;
+.category-card i {
+  color: black;
+}
+.category-card span {
+  color: #333;
 }

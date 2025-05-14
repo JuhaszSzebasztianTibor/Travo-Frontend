@@ -51,15 +51,14 @@ export const getTripById = async (tripId) => {
   }
 };
 
-export const getAllTrips = () => {
-  return api.get("/Trips").then((res) => {
-    console.log("All trips response:", res.data); // Log to verify the structure
-    return res.data;
-  });
-};
+export const getMyTrips = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Not authenticated");
 
-export const getMyTrips = () => {
-  return api.get("/Trips/me").then((res) => res.data);
+  const res = await api.get("/Trips", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
 };
 
 export const deleteTrip = async (id) => {

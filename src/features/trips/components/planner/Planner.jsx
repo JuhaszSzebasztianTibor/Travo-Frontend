@@ -4,6 +4,7 @@ import { useParams, useLocation } from "react-router-dom";
 import { parseISO, differenceInCalendarDays, addDays, format } from "date-fns";
 
 import { getTripById } from "../../../../services/trips/tripService";
+import { getTripBudgets } from "../../../../services/budget/budgetService";
 import { currencySymbolsData } from "../../../../data/currencySymbolsData";
 
 import PlannerHeader from "./PlannerHeader";
@@ -25,6 +26,7 @@ const Planner = () => {
   const [selectedDestinationNights, setSelectedDestinationNights] = useState(0);
   const [newDestination, setNewDestination] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [budgets, setBudgets] = useState([]);
 
   // Fetch trip data
   // Update useEffect dependency array
@@ -34,6 +36,10 @@ const Planner = () => {
         const data = await getTripById(tripId);
         setTripInfo(data);
         setDestinations(data.destinations || []);
+
+        // Fetch budgets after trip data
+        const tripBudgets = await getTripBudgets(tripId);
+        setBudgets(tripBudgets);
       } catch (err) {
         console.error("Failed to fetch trip data:", err);
       }
@@ -106,6 +112,7 @@ const Planner = () => {
   const goal = differenceInCalendarDays(endDate, startDate) + 1;
   const totalNights = destinations.reduce((sum, d) => sum + d.nights, 0);
   const progress = Math.min(100, Math.round((totalNights / goal) * 100));
+  const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
 
   const handleNightsChange = (idx, nights) =>
     setDestinations((dests) =>
@@ -144,7 +151,7 @@ const Planner = () => {
         <PlannerHeader
           currency={currency}
           currencySymbols={currencySymbolsData}
-          amount={100}
+          amount={totalBudget}
           handleCurrencyChange={handleCurrencyChange}
           nightsPlanned={totalNights}
           progress={progress}

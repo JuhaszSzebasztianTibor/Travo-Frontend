@@ -5,27 +5,18 @@ import {
 } from "react-circular-progressbar";
 import "./budget.css"; // Import your custom styles
 
-const SummaryPanel = ({ expenses, categories, getCategoryIcon }) => {
-  const totalCost = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-  const paidTotal = expenses
-    .filter((e) => e.status === "Paid")
-    .reduce((sum, e) => sum + Number(e.amount), 0);
-  const pendingTotal = expenses
-    .filter((e) => e.status === "Pending")
-    .reduce((sum, e) => sum + Number(e.amount), 0);
+const SummaryPanel = ({ items, categories, getIcon }) => {
+  const total = items.reduce((sum, i) => sum + Number(i.amount), 0);
+  const paid = items
+    .filter((i) => i.status === "Paid")
+    .reduce((sum, i) => sum + Number(i.amount), 0);
+  const paidPercentage = total ? Math.min((paid / total) * 100, 100) : 0;
 
-  const getCategoryAmount = (cat) =>
-    expenses
-      .filter((e) => e.status === "Paid" && e.category === cat)
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-  // Calculate progress as a percentage for the paid amount
-  const paidPercentage =
-    totalCost > 0
-      ? paidTotal >= totalCost
-        ? 100
-        : Math.min((paidTotal / totalCost) * 100, 97)
-      : 0;
+  const getCategoryTotal = (cat) =>
+    items
+      .filter((i) => i.status === "Paid" && i.category === cat)
+      .reduce((sum, i) => sum + Number(i.amount), 0)
+      .toFixed(2);
 
   return (
     <div className="right-panel">
@@ -46,7 +37,7 @@ const SummaryPanel = ({ expenses, categories, getCategoryIcon }) => {
           >
             {/* Overlayed Text */}
             <div className="progress-text">
-              <h2>€{totalCost.toFixed(2)}</h2>
+              <h2>€{total.toFixed(2)}</h2>
               <p>Total trip cost</p>
             </div>
           </CircularProgressbarWithChildren>
@@ -56,31 +47,31 @@ const SummaryPanel = ({ expenses, categories, getCategoryIcon }) => {
       <div className="summary-breakdown">
         <div className="status paid">
           <div className="status-label">
-            <span className="dot"></span>
+            <span className="dot paid" />
             <p>
-              <strong>Paid</strong>
+              <strong>Paid</strong>: €{paid.toFixed(2)}
             </p>
           </div>
-          <p className="total">€{paidTotal.toFixed(2)}</p>
         </div>
         <div className="status pending">
           <div className="status-label">
-            <span className="dot"></span>
+            <span className="dot pending" />
             <p>
-              <strong>Pending</strong>
+              <strong>Pending</strong>: €{(total - paid).toFixed(2)}
             </p>
           </div>
-          <p className="total">€{pendingTotal.toFixed(2)}</p>
         </div>
       </div>
 
       <div className="category-summary">
         <h2>Paid by Category</h2>
         <div className="category-items">
-          {categories.map((cat, i) => (
-            <div className="category-card" key={i}>
-              <i className={`fa ${getCategoryIcon(cat)}`}></i>
-              {cat}: €{getCategoryAmount(cat).toFixed(2)}
+          {categories.map((cat) => (
+            <div className="category-card" key={cat}>
+              <i className={`fa ${getIcon(cat)}`} />
+              <span>
+                {cat}: €{getCategoryTotal(cat)}
+              </span>
             </div>
           ))}
         </div>

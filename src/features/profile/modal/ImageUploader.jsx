@@ -11,7 +11,7 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
   };
 
   const handleUrlInput = (e) => {
-    // Clear file when URL is entered
+    if (imageFile) return; // Block change if a file is selected
     onUrlChange(e);
     onFileChange(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -37,7 +37,7 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
           }
           className="image-url-input"
           required
-          disabled={!!imageFile}
+          readOnly={!!imageFile}
         />
 
         {/* File Upload */}
