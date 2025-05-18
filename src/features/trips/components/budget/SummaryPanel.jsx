@@ -49,7 +49,7 @@ const SummaryPanel = ({ items, categories, getIcon }) => {
           <div className="status-label">
             <span className="dot paid" />
             <p>
-              <strong>Paid</strong>: €{paid.toFixed(2)}
+              <strong>Paid</strong> €{paid.toFixed(2)}
             </p>
           </div>
         </div>
@@ -57,7 +57,7 @@ const SummaryPanel = ({ items, categories, getIcon }) => {
           <div className="status-label">
             <span className="dot pending" />
             <p>
-              <strong>Pending</strong>: €{(total - paid).toFixed(2)}
+              <strong>Pending</strong> €{(total - paid).toFixed(2)}
             </p>
           </div>
         </div>

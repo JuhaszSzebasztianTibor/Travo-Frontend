@@ -3,7 +3,7 @@ export const getCategoryIcon = (category) => {
     case "Sleep":
       return "fa-bed";
     case "Transport":
-      return "fa-car";
+      return "fas fa-plane";
     case "Visit Places":
       return "fas fa-university";
     case "Eat & Drinks":

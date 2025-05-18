@@ -9,8 +9,8 @@ import Profile from "./pages/ProfilePage/ProfilePage.jsx";
 import PlannerPage from "./pages/PlannerPage/PlannerPage.jsx";
 import BudgetPage from "./pages/BudgetPage/BudgetPage.jsx";
 import PackingPage from "./pages/PackingPage/PackingPage.jsx";
-import ProtectedRoute from "./utils/ProtectedRoute.jsx";
-import PublicOnlyRoute from "./utils/PublicOnlyRoute.jsx";
+import ProtectedRoute from "./hooks/ProtectedRoute.jsx";
+import PublicOnlyRoute from "./hooks/PublicOnlyRoute.jsx";
 
 function App() {
   return (

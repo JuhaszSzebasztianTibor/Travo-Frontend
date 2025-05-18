@@ -1,9 +1,10 @@
+// src/components/PlannerSidebar/PlannerSidebar.jsx
 import React, { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
 import Plane from "../../assets/Images/travoplane.png";
 import Modal from "../Modal/Modal";
 import TripForm from "../../features/profile/modal/TripForm";
-import api from "../../api/api"; // Use the configured API instance
+import api from "../../api/api";
 import "./plannerSidebar.css";
 
 const PlannerSidebar = () => {
@@ -16,36 +17,22 @@ const PlannerSidebar = () => {
   useEffect(() => {
     if (!isEditOpen) return;
 
-    const fetchTrip = async () => {
-      setLoading(true);
-      try {
-        // 1. Use the api instance instead of axios directly
-        const res = await api.get(`/Trips/${tripId}`);
-
-        if (!res.data) {
-          console.error("No trip data received");
-          return;
-        }
-
-        const trip = res.data;
-
+    setLoading(true);
+    api
+      .get(`/Trips/${tripId}`)
+      .then((res) => {
+        const t = res.data;
         setInitialValues({
-          name: trip.tripName || "",
-          startDate: trip.startDate ? trip.startDate.slice(0, 10) : "",
-          endDate: trip.endDate ? trip.endDate.slice(0, 10) : "",
-          description: trip.description || "",
-          imageUrl: trip.image || "",
+          name: t.tripName || "",
+          startDate: t.startDate?.slice(0, 10) || "",
+          endDate: t.endDate?.slice(0, 10) || "",
+          description: t.description || "",
+          imageUrl: t.image || "",
           imageFile: null,
         });
-      } catch (error) {
-        console.error("Failed to fetch trip:", error);
-        navigate("/error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrip();
+      })
+      .catch(() => navigate("/error"))
+      .finally(() => setLoading(false));
   }, [isEditOpen, tripId, navigate]);
 
   const handleUpdateTrip = async (formData) => {
@@ -54,7 +41,6 @@ const PlannerSidebar = () => {
     form.append("StartDate", formData.startDate);
     form.append("EndDate", formData.endDate);
     form.append("Description", formData.description);
-
     if (formData.imageFile) {
       form.append("ImageFile", formData.imageFile);
     } else {
@@ -62,58 +48,78 @@ const PlannerSidebar = () => {
     }
 
     try {
-      // 2. Verify endpoint casing matches backend route
       await api.put(`/Trips/${tripId}`, form);
       setIsEditOpen(false);
       navigate(`/trip/plan/${tripId}`);
-    } catch (error) {
-      console.error("Update failed:", error);
+    } catch {
       alert("Failed to update trip. Please try again.");
     }
   };
+
   return (
     <div className="planner-sidebar">
-      <Link to="/profile">
+      <NavLink to="/profile">
         <img src={Plane} alt="Plane" className="plane-img" />
-      </Link>
+      </NavLink>
+
       <ul>
         <li>
-          <Link to={`/trip/view/${tripId}`}>
-            <i className="fa fa-eye"></i> <span>View</span>
-          </Link>
+          <NavLink
+            to={`/trip/view/${tripId}`}
+            className={({ isActive }) => (isActive ? "active" : undefined)}
+          >
+            <i className="fa fa-eye"></i>
+            <span>View</span>
+          </NavLink>
         </li>
+
         <li>
-          <Link to={`/trip/plan/${tripId}`}>
-            <i className="fas fa-map-marker-alt"></i> <span>Plan</span>
-          </Link>
+          <NavLink
+            to={`/trip/plan/${tripId}`}
+            className={({ isActive }) => (isActive ? "active" : undefined)}
+          >
+            <i className="fas fa-map-marker-alt"></i>
+            <span>Plan</span>
+          </NavLink>
         </li>
+
         <li>
-          <Link to={`/trip/budget/${tripId}`}>
-            <i className="fas fa-wallet"></i> <span>Budget</span>
-          </Link>
+          <NavLink
+            to={`/trip/budget/${tripId}`}
+            className={({ isActive }) => (isActive ? "active" : undefined)}
+          >
+            <i className="fas fa-wallet"></i>
+            <span>Budget</span>
+          </NavLink>
         </li>
+
         <li>
-          <Link to={`/trip/packing/${tripId}`}>
-            <i className="fa fa-shirt"></i> <span>Packing</span>
-          </Link>
+          <NavLink
+            to={`/trip/packing/${tripId}`}
+            className={({ isActive }) => (isActive ? "active" : undefined)}
+          >
+            <i className="fa fa-shirt"></i>
+            <span>Packing</span>
+          </NavLink>
         </li>
-        <li>
-          <Link to="#" onClick={() => setIsEditOpen(true)}>
+
+        <li className="last-link">
+          <button className="edit-btn" onClick={() => setIsEditOpen(true)}>
             <i className="fas fa-edit"></i>
-          </Link>
+          </button>
         </li>
       </ul>
 
       <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)}>
-        {initialValues ? (
+        {loading || !initialValues ? (
+          <div>Loading...</div>
+        ) : (
           <TripForm
-            key={tripId} // force re-mount when tripId changes
+            key={tripId}
             onSubmit={handleUpdateTrip}
             initialValues={initialValues}
             submitLabel="Update Trip"
           />
-        ) : (
-          <div>Loading...</div>
         )}
       </Modal>
     </div>

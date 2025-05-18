@@ -1,3 +1,5 @@
+/* src/components/PlannerSidebar/plannerSidebar.css */
+
 /* PlannerSidebar container */
 .planner-sidebar {
   display: flex;
@@ -28,8 +30,9 @@
   width: 100%; /* Ensure the li takes full width of the sidebar */
 }
 
-/* Styling for links inside the li */
-.planner-sidebar li a {
+/* Styling for links and buttons inside the li */
+.planner-sidebar li a,
+.planner-sidebar .edit-btn {
   text-decoration: none;
   color: #333;
   font-size: 14px;
@@ -38,7 +41,10 @@
   align-items: center;
   padding: 12px 0; /* Padding only around text and icon */
   width: 100%; /* Ensure the link takes up full width of the li */
+  background: transparent;
+  border: none;
   box-sizing: border-box; /* Prevents padding from increasing the width */
+  cursor: pointer;
 }
 
 /* Style for the icon */
@@ -49,13 +55,16 @@
   -webkit-text-stroke: 1px black;
 }
 
-/* Optional: style the text color when hovered */
+/* Optional: style the text/​icon color when hovered */
 .planner-sidebar a:hover i,
-.planner-sidebar a:hover span {
+.planner-sidebar a:hover span,
+.planner-sidebar .edit-btn:hover i {
   color: rgb(2, 161, 2); /* Change color of icon and text on hover */
 }
 
-.planner-sidebar a {
+/* Ensure full‑width clickable area */
+.planner-sidebar a,
+.planner-sidebar .edit-btn {
   display: block;
   width: 100%;
 }
@@ -72,7 +81,38 @@
   cursor: pointer;
 }
 
-.planner-sidebar li:last-child {
+.planner-sidebar li:last-child,
+.planner-sidebar .last-link {
   margin-top: auto;
   border-top: 1px solid #aeabab;
+}
+
+/* === ACTIVE STATE COLORS === */
+.planner-sidebar li a.active i,
+.planner-sidebar li a.active span {
+  /* default active if needed */
+}
+
+/* View → blue */
+.planner-sidebar li a[href*="/trip/view/"].active i,
+.planner-sidebar li a[href*="/trip/view/"].active span {
+  color: blue;
+}
+
+/* Plan → red */
+.planner-sidebar li a[href*="/trip/plan/"].active i,
+.planner-sidebar li a[href*="/trip/plan/"].active span {
+  color: red;
+}
+
+/* Budget → green */
+.planner-sidebar li a[href*="/trip/budget/"].active i,
+.planner-sidebar li a[href*="/trip/budget/"].active span {
+  color: green;
+}
+
+/* Packing → hotpink */
+.planner-sidebar li a[href*="/trip/packing/"].active i,
+.planner-sidebar li a[href*="/trip/packing/"].active span {
+  color: #f73f7f;
 }

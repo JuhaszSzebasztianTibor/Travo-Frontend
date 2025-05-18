@@ -1,6 +1,12 @@
 import api from "../../api/api";
 import { logout } from "../auth/authService";
 
+const withAuth = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
+
 export const createTrip = async (tripData) => {
   const token = localStorage.getItem("token"); // Fetch the token from localStorage
   console.log("Token:", token); // Log the token to ensure it exists
@@ -18,11 +24,7 @@ export const createTrip = async (tripData) => {
   }
 
   try {
-    const res = await api.post("/Trips", formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await api.post("/Trips", formData, withAuth);
     return res.data;
   } catch (error) {
     if (error.response) {
@@ -39,11 +41,7 @@ export const getTripById = async (tripId) => {
   const token = localStorage.getItem("token");
 
   try {
-    const response = await api.get(`/Trips/${tripId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Add token to the Authorization header
-      },
-    });
+    const response = await api.get(`/Trips/${tripId}`, withAuth);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch trip:", error);
@@ -55,9 +53,7 @@ export const getMyTrips = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Not authenticated");
 
-  const res = await api.get("/Trips", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await api.get("/Trips", withAuth);
   return res.data;
 };
 
@@ -69,11 +65,7 @@ export const deleteTrip = async (id) => {
   }
 
   try {
-    await api.delete(`/Trips/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Add token to the Authorization header
-      },
-    });
+    await api.delete(`/Trips/${id}`, withAuth);
   } catch (error) {
     console.error("Failed to delete trip:", error);
     throw error; // Propagate the error to be handled elsewhere
