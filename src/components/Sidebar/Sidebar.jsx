@@ -55,17 +55,16 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
     <div className="sidebar">
       <div
         className="image-placeholder"
-        onClick={() => setModalOpen(true)}
         style={{
           backgroundImage: `url(${
             user?.photoUrl
-              ? `https://localhost:7196${user.photoUrl}?t=${Date.now()}`
+              ? `https://localhost:7196${user.photoUrl}`
               : "/upload-user.png"
           })`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          cursor: "pointer",
         }}
+        onClick={() => setModalOpen(true)}
       />
 
       <PhotoUploadForm

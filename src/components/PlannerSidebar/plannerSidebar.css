@@ -87,12 +87,6 @@
   border-top: 1px solid #aeabab;
 }
 
-/* === ACTIVE STATE COLORS === */
-.planner-sidebar li a.active i,
-.planner-sidebar li a.active span {
-  /* default active if needed */
-}
-
 /* View → blue */
 .planner-sidebar li a[href*="/trip/view/"].active i,
 .planner-sidebar li a[href*="/trip/view/"].active span {
