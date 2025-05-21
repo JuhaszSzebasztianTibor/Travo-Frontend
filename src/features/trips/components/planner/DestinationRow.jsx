@@ -1,6 +1,7 @@
+// src/components/planner/DestinationRow.jsx
 import React from "react";
 
-const DestinationRow = ({
+export default function DestinationRow({
   index,
   name,
   nights,
@@ -10,16 +11,20 @@ const DestinationRow = ({
   endDate,
   onNightsChange,
   onActivityClick,
+  onDelete,
   totalNightsPlanned,
   goal,
-}) => {
+}) {
   const canAddMore = totalNightsPlanned < goal;
 
   return (
     <div className="destination-row">
+      {/* Number bubble */}
       <div className="counterContainer">
         <div className="counter">{index + 1}</div>
       </div>
+
+      {/* Name & date */}
       <div className="destination-name destination-column">
         <h3>{name}</h3>
         <div className="date-range">
@@ -28,23 +33,25 @@ const DestinationRow = ({
           </span>
         </div>
       </div>
+
+      {/* Nights control */}
       <div className="destination-nights destination-column">
         <div className="destination-duration">
           <div className="duration-controls">
             <div
               className="days-control minus"
               onClick={() => onNightsChange(index, Math.max(1, nights - 1))}
-            ></div>
+            />
             <input
               type="number"
               className="days"
               value={nights}
               min="1"
               onChange={(e) => {
-                const newVal = parseInt(e.target.value) || 1;
-                const diff = newVal - nights;
-                if (newVal >= 1 && totalNightsPlanned + diff <= goal) {
-                  onNightsChange(index, newVal);
+                const val = parseInt(e.target.value, 10) || 1;
+                const diff = val - nights;
+                if (val >= 1 && totalNightsPlanned + diff <= goal) {
+                  onNightsChange(index, val);
                 }
               }}
             />
@@ -53,22 +60,30 @@ const DestinationRow = ({
               onClick={() => {
                 if (canAddMore) onNightsChange(index, nights + 1);
               }}
-            ></div>
+            />
           </div>
         </div>
       </div>
+
+      {/* Sleep, Discover, Transport icons */}
       <div className="destination-sleep destination-column">
-        <a className="add-btn" href="#">
+        <a
+          className="add-btn"
+          href=""
+          onClick={(e) => {
+            e.preventDefault(); // prevents the jump
+          }}
+        >
           <i className="fa fa-plus-circle"></i>
         </a>
       </div>
       <div className="destination-activities destination-column">
         <a
           className="add-btn"
-          href="#"
+          href=""
           onClick={(e) => {
             e.preventDefault();
-            onActivityClick(name, nights); // Pass both name and nights
+            onActivityClick(name, nights);
           }}
         >
           {activities > 0 ? (
@@ -81,7 +96,7 @@ const DestinationRow = ({
         </a>
       </div>
       <div className="destination-transport destination-column">
-        <a className="add-btn" href="#">
+        <a className="add-btn" href="">
           {transport ? (
             <span className="transport-selected">{transport}</span>
           ) : (
@@ -89,8 +104,20 @@ const DestinationRow = ({
           )}
         </a>
       </div>
+
+      {/* Delete overlay */}
+      <div className="delete-container">
+        <a
+          className="delete-btn"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onDelete();
+          }}
+        >
+          <i className="fa fa-trash"></i>
+        </a>
+      </div>
     </div>
   );
-};
-
-export default DestinationRow;
+}

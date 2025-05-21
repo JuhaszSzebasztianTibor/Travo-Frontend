@@ -1,6 +1,9 @@
-import useTripForm from "../hooks/useTripForm";
+// TripForm.jsx
+
+import React from "react";
+import ImageUploader from "./ImageUploader"; // This is a default import
 import DateRangePicker from "./DateRangePicker";
-import ImageUploader from "./ImageUploader";
+import useTripForm from "../hooks/useTripForm";
 import "./trip.css";
 
 const TripForm = ({

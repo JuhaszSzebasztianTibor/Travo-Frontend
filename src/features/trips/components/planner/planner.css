@@ -1,4 +1,5 @@
 /* planner.css */
+
 .planner-container {
   display: flex;
   height: 100vh;
@@ -24,6 +25,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+  max-width: 500px;
 }
 
 .trip-title-wrapper span i {
@@ -193,8 +195,7 @@
   border-bottom: 2px solid green;
 }
 
-/* Destination list */
-
+/* Destination list header */
 .destinationview-table-header ul {
   display: flex;
   list-style: none;
@@ -231,7 +232,7 @@
   align-items: center;
   padding: 15px 10px;
   border-bottom: 1px solid #aeabab;
-  position: relative;
+  position: relative; /* enable absolute children */
 }
 
 .counterContainer {
@@ -274,7 +275,6 @@
   font-size: 13px;
   white-space: nowrap;
   width: auto;
-  /* prevent flex containers from forcing it smaller */
   flex-shrink: 0;
   color: #666;
   font-weight: 600;
@@ -366,6 +366,35 @@
   color: #666;
 }
 
+/* Delete button: hidden by default, shown on hover */
+.delete-container {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+
+.destination-row:hover .delete-container {
+  opacity: 1;
+}
+
+.destination-row:hover .delete-container .delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c00; /* red */
+  background: rgba(255, 255, 255, 0.8);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.destination-row:hover .delete-container .delete-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+}
+
 /* Planner controls */
 .planner-controls {
   margin-top: 20px;
@@ -382,6 +411,7 @@
 }
 
 .add-destination-btn {
+  position: relative;
   display: flex;
   align-items: center;
   margin: 1rem 0.5rem 0 0.5rem;
@@ -389,6 +419,7 @@
   border-radius: 10px;
   padding: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 1;
 }
 
 .add-destination-btn input {
@@ -412,30 +443,12 @@
   padding: 0 8px;
 }
 
-.map-container {
-  flex: 1;
-  height: 100vh;
-  position: relative;
-}
-
-.map-marker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate(-50%, -100%);
-}
-
-.mapboxgl-popup-content {
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
+/* absolutely position the dropdown under the input/button container */
 .suggestions-list {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
-  right: 40px; /* leave space for the ➤ button */
+  right: 0;
   background: #fff;
   border: 1px solid #ddd;
   max-height: 200px;
@@ -453,4 +466,24 @@
 
 .suggestions-list li:hover {
   background-color: #f0f0f0;
+}
+
+/* Map container */
+.map-container {
+  flex: 1;
+  height: 100vh;
+  position: relative;
+}
+
+.map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -100%);
+}
+
+.mapboxgl-popup-content {
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

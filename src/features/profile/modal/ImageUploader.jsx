@@ -5,13 +5,12 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0] || null;
-    // Clear URL when file is selected
     onFileChange(file);
     onUrlChange({ target: { name: "imageUrl", value: "" } });
   };
 
   const handleUrlInput = (e) => {
-    if (imageFile) return; // Block change if a file is selected
+    if (imageFile) return; // Block URL change if a file is selected
     onUrlChange(e);
     onFileChange(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -67,6 +66,18 @@ const ImageUploader = ({ imageUrl, imageFile, onUrlChange, onFileChange }) => {
             </>
           )}
         </div>
+
+        {/* Image Preview */}
+        {imageUrl && !imageFile && (
+          <img src={imageUrl} alt="Preview" className="preview-image" />
+        )}
+        {imageFile && !imageUrl && (
+          <img
+            src={URL.createObjectURL(imageFile)}
+            alt="Preview"
+            className="preview-image"
+          />
+        )}
       </div>
     </>
   );

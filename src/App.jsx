@@ -11,6 +11,7 @@ import BudgetPage from "./pages/BudgetPage/BudgetPage.jsx";
 import PackingPage from "./pages/PackingPage/PackingPage.jsx";
 import ProtectedRoute from "./hooks/ProtectedRoute.jsx";
 import PublicOnlyRoute from "./hooks/PublicOnlyRoute.jsx";
+import ViewPage from "./pages/ViewPage/viewPage.jsx";
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
         </Route>
 
         <Route element={<PlannerLayout />}>
+          <Route
+            path="/trip/view/:tripId"
+            element={
+              <ProtectedRoute>
+                <ViewPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/trip/plan/:tripId"
             element={

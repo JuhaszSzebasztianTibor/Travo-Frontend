@@ -21,7 +21,7 @@ export default function useTripForm(onSubmit, initialValues = {}) {
         startDate: initialValues.startDate?.slice(0, 10) || "",
         endDate: initialValues.endDate?.slice(0, 10) || "",
         description: initialValues.description || "",
-        imageUrl: initialValues.imageUrl || "",
+        imageUrl: initialValues.imageUrl?.replace(/^\/+/, "") || "",
         imageFile: null,
       });
     }
@@ -29,7 +29,11 @@ export default function useTripForm(onSubmit, initialValues = {}) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTripData((prev) => ({ ...prev, [name]: value }));
+
+    setTripData((prev) => ({
+      ...prev,
+      [name]: name === "imageUrl" ? value.replace(/^\/+/, "") : value,
+    }));
   };
 
   const handleFileChange = (file) => {

@@ -9,7 +9,9 @@ export default function UpcomingTrips({ trips, onDeleted }) {
       <h2>Past Trips</h2>
       <div className="trip-cards-container">
         {trips.length > 0 ? (
-          trips.map((trip) => <TripCard trip={trip} onDeleted={onDeleted} />)
+          trips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} onDeleted={onDeleted} />
+          ))
         ) : (
           <p>No upcoming trips</p>
         )}

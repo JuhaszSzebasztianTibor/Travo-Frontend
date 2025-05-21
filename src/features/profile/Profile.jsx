@@ -17,6 +17,8 @@ const Profile = () => {
     setTrips((prev) => prev.filter((trip) => trip.id !== deletedId));
   };
 
+  console.log("Upcoming trips:", upcomingTrips);
+
   return (
     <div className="profile-container">
       <Sidebar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />

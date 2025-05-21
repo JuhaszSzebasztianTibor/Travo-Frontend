@@ -169,3 +169,11 @@
   border-color: rgb(2, 161, 2);
   background-color: white;
 }
+
+.preview-image {
+  max-width: 100px; /* Max width */
+  max-height: 100px; /* Max height */
+  object-fit: cover; /* Crop the image to fit within the box */
+  border-radius: 10px; /* Optional: Adds rounded corners */
+  margin-top: 10px; /* Optional: Adds some space above the image */
+}

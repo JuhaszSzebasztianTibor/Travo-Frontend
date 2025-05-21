@@ -1,5 +1,5 @@
 // TripCard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/formDate";
 import { deleteTrip } from "../../services/trips/tripService";
@@ -9,6 +9,32 @@ export default function TripCard({ trip, onDeleted }) {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  /**
+   * Normalize trip.imageUrl into something <img> can consume:
+   * - If it starts with http:// or https:// → return as-is
+   * - If it starts with data: → return as-is
+   * - Otherwise assume it's raw base64 → prefix with data:image/jpeg;base64,
+   */
+  const getImageSrc = (raw) => {
+    if (!raw) return "";
+
+    // strip any leading "/" so "/data:…" or "/9j/…" become "data:…" or "9j/…"
+    const clean = raw.replace(/^\/+/, "");
+
+    // HTTP(S)? → bail out
+    if (/^https?:\/\//i.test(clean)) {
+      return clean;
+    }
+
+    // Data-URI? → bail out
+    if (/^data:/i.test(clean)) {
+      return clean;
+    }
+
+    // Otherwise assume it’s raw base64 JPEG payload
+    return `data:image/jpeg;base64,${clean}`;
+  };
 
   const handleConfirmDelete = async (e) => {
     e.stopPropagation();
@@ -21,6 +47,10 @@ export default function TripCard({ trip, onDeleted }) {
     }
   };
 
+  useEffect(() => {
+    console.log("RAW API JSON:", trip);
+  }, [trip]);
+
   return (
     <>
       <div
@@ -28,10 +58,11 @@ export default function TripCard({ trip, onDeleted }) {
         onClick={() => navigate(`/trip/plan/${trip.id}`)}
       >
         <img
-          src={trip.imageUrl}
+          src={getImageSrc(trip.imageUrl)}
           className="trip-image"
-          alt={`Trip to ${trip.tripName}`}
+          alt={trip.tripName ? `Trip to ${trip.tripName}` : "Trip image"}
         />
+
         <div className="trip-card-content">
           <div className="trip-card-header">
             <h3>{trip.tripName}</h3>

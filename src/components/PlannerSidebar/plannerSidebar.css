@@ -90,7 +90,7 @@
 /* View → blue */
 .planner-sidebar li a[href*="/trip/view/"].active i,
 .planner-sidebar li a[href*="/trip/view/"].active span {
-  color: blue;
+  color: lightskyblue;
 }
 
 /* Plan → red */

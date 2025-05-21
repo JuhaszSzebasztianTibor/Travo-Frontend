@@ -8,7 +8,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 const MapView = ({ destinations, startDate }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const markersRef = useRef([]); // Store marker references
+  const markersRef = useRef([]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -37,17 +37,24 @@ const MapView = ({ destinations, startDate }) => {
     let dateCursor = new Date(startDate);
 
     destinations.forEach((dest, index) => {
+      const lat = dest.lat ?? dest.latitude;
+      const lng = dest.lng ?? dest.longitude;
+
+      if (!isFinite(lat) || !isFinite(lng)) {
+        console.warn(`Skipping invalid destination at index ${index}:`, dest);
+        return;
+      }
+
       const start = format(dateCursor, "MMM d, yyyy");
       const end = format(addDays(dateCursor, dest.nights - 1), "MMM d, yyyy");
 
       const popupContent = `
-      <div>
-        <h3>${dest.name} (${dest.nights} ${
-        dest.nights === 1 ? "night" : "nights"
-      })</h3>
-        <p>${start} – ${end}</p>
-      </div>
-    `;
+        <div>
+          <h2>${dest.name}</h2>
+          <h3>(${dest.nights} ${dest.nights === 1 ? "night" : "nights"})</h3>
+          <p>${start} – ${end}</p>
+        </div>
+      `;
 
       const markerDiv = document.createElement("div");
       markerDiv.className = "map-marker";
@@ -62,42 +69,43 @@ const MapView = ({ destinations, startDate }) => {
       markerDiv.style.color = "green";
       markerDiv.style.fontWeight = "bold";
       markerDiv.style.fontSize = "14px";
-      markerDiv.textContent = index + 1; // Number the markers 1, 2, 3, ...
+      markerDiv.textContent = index + 1;
 
-      // Set popup without close button
       const markerPopup = new mapboxgl.Popup({
         offset: 25,
         closeButton: false,
       }).setHTML(popupContent);
 
       const marker = new mapboxgl.Marker(markerDiv)
-        .setLngLat([dest.lng, dest.lat])
+        .setLngLat([lng, lat])
         .setPopup(markerPopup)
         .addTo(map.current);
 
       markersRef.current.push(marker);
 
-      // Open the popup when hovering over the marker
       markerDiv.addEventListener("mouseenter", () => {
-        marker.getPopup().addTo(map.current); // Show the popup
+        marker.getPopup().addTo(map.current);
       });
 
-      // Close the popup when mouse leaves the marker
       markerDiv.addEventListener("mouseleave", () => {
-        marker.getPopup().remove(); // Hide the popup
+        marker.getPopup().remove();
       });
 
-      // Advance dateCursor
       dateCursor = addDays(dateCursor, dest.nights);
     });
 
-    // Fit to bounds with max zoom
-    if (destinations.length) {
-      const bounds = new mapboxgl.LngLatBounds();
-      destinations.forEach((d) => bounds.extend([d.lng, d.lat]));
+    // Fit to bounds if valid coordinates exist
+    const bounds = new mapboxgl.LngLatBounds();
+    destinations.forEach((d) => {
+      const lat = d.lat ?? d.latitude;
+      const lng = d.lng ?? d.longitude;
+      if (isFinite(lat) && isFinite(lng)) bounds.extend([lng, lat]);
+    });
+
+    if (!bounds.isEmpty()) {
       map.current.fitBounds(bounds, {
         padding: 100,
-        maxZoom: 8, // Prevents zooming in too much
+        maxZoom: 8,
       });
     }
   }, [destinations, startDate]);

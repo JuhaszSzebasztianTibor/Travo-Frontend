@@ -26,7 +26,7 @@ export default function MainLayout() {
         startDate: t.startDate,
         endDate: t.endDate,
         description: t.description,
-        imageUrl: t.image,
+        imageUrl: t.imageUrl,
       }));
       setTrips(normalized);
     } catch (err) {
