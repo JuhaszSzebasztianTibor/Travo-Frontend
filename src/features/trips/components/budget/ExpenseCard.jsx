@@ -14,7 +14,7 @@ const ExpenseCard = ({ item, getIcon, onEdit, onDelete }) => (
 
     <div className="action-icons">
       <i className="fa fa-edit edit" onClick={() => onEdit(item)} />
-      <i className="fa fa-trash delete" onClick={() => onDelete(item.id)} />
+      <i className="fa fa-trash delete" onClick={() => onDelete(item)} />
     </div>
   </div>
 );

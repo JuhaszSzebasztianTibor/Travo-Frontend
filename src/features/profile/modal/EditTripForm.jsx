@@ -25,7 +25,7 @@ const EditTripPage = () => {
           startDate: trip.StartDate ? trip.StartDate.slice(0, 10) : "",
           endDate: trip.EndDate ? trip.EndDate.slice(0, 10) : "",
           description: trip.Description || "",
-          imageUrl: trip.Image || "",
+          imageUrl: trip.imageUrl || "",
           imageFile: null,
         });
       } catch (error) {

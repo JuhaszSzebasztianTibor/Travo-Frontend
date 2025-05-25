@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/formDate";
 import { deleteTrip } from "../../services/trips/tripService";
-import DeleteTripForm from "./DeleteTripForm";
+import DeleteTripForm from "./modal/DeleteTripForm";
 
 export default function TripCard({ trip, onDeleted }) {
   const navigate = useNavigate();

@@ -21,7 +21,7 @@ export default function useTripForm(onSubmit, initialValues = {}) {
         startDate: initialValues.startDate?.slice(0, 10) || "",
         endDate: initialValues.endDate?.slice(0, 10) || "",
         description: initialValues.description || "",
-        imageUrl: initialValues.imageUrl?.replace(/^\/+/, "") || "",
+        imageUrl: (initialValues.imageUrl || "").replace(/^\/+/, ""),
         imageFile: null,
       });
     }

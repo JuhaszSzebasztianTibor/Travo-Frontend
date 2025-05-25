@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import SummaryPanel from "./SummaryPanel";
 import BudgetFormModal from "./BudgetFormModal";
+import DeleteBudgetForm from "./DeleteBudgetForm"; // ← import it
 import PaidExpenses from "./PaidExpenses";
 import PendingExpenses from "./PendingExpenses";
 import {
@@ -17,13 +18,19 @@ const Budget = () => {
   const { tripId } = useParams();
   const [items, setItems] = useState([]);
   const [modal, setModal] = useState({ show: false, item: null });
+  const [deleteModal, setDeleteModal] = useState({ show: false, item: null });
 
   useEffect(() => {
     getTripBudgets(tripId).then(setItems).catch(console.error);
   }, [tripId]);
 
+  /* Editing or adding */
   const openModal = (item = null) => setModal({ show: true, item });
   const closeModal = () => setModal({ show: false, item: null });
+
+  /* Deleting */
+  const openDelete = (item) => setDeleteModal({ show: true, item });
+  const closeDelete = () => setDeleteModal({ show: false, item: null });
 
   const handleSave = async (data) => {
     const saved = modal.item
@@ -39,19 +46,18 @@ const Budget = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this entry?")) return;
     await deleteBudget(tripId, id);
     setItems((prev) => prev.filter((i) => i.id !== id));
+    closeDelete();
   };
 
   return (
     <div className="budget-container">
-      {/* Existing component structure remains the same */}
       <PaidExpenses
         items={items}
         onAdd={() => openModal()}
         onEdit={openModal}
-        onDelete={handleDelete}
+        onDelete={openDelete} // pass the full item
         getIcon={getCategoryIcon}
       />
 
@@ -59,7 +65,7 @@ const Budget = () => {
         items={items}
         onAdd={openModal}
         onEdit={openModal}
-        onDelete={handleDelete}
+        onDelete={openDelete} // pass the full item
         getIcon={getCategoryIcon}
       />
 
@@ -76,6 +82,14 @@ const Budget = () => {
           onSave={handleSave}
         />
       )}
+
+      <DeleteBudgetForm
+        showModal={deleteModal.show}
+        setShowModal={setDeleteModal}
+        itemName={deleteModal.item?.name}
+        item={deleteModal.item}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };

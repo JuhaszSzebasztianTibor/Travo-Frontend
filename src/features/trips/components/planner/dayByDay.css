@@ -1,15 +1,59 @@
-/* dayByDay.css */
+/* src/components/planner/dayByDay.css */
+
 .day-by-day-tab {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  max-width: 900px;
   margin: 0 auto;
+  max-width: 900px;
+  overflow: visible;
   padding: 20px;
+  transition: all 0.3s ease;
 }
 
-.day-by-day-tab .day-list {
+.day-by-day-tab .add-btn {
+  background: #27ae60;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.day-by-day-tab .add-btn:hover {
+  background: #219150;
+}
+
+.day-by-day-tab .badge {
+  align-items: center;
+  background: #eafaf1;
+  border-radius: 999px;
+  color: #27ae60;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  font-size: 0.75rem;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.day-by-day-tab .category-btn {
+  background: #f1f3f5;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: background 0.2s;
+}
+
+.day-by-day-tab .category-btn.active {
+  background: #27ae60;
+  color: #fff;
+}
+
+.day-by-day-tab .category-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .day-by-day-tab .day-card {
@@ -24,13 +68,33 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.day-by-day-tab .day-date {
+  color: green;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.day-by-day-tab .day-details {
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
 .day-by-day-tab .day-header {
+  align-items: center;
+  background: #f8f9fa;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 1rem;
-  cursor: pointer;
-  background: #f8f9fa;
+}
+
+.day-by-day-tab .day-header i {
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
 }
 
 .day-by-day-tab .day-header-info {
@@ -38,139 +102,58 @@
   flex-direction: column;
 }
 
-.day-by-day-tab .day-date {
-  font-weight: 600;
-  font-size: 18px;
-  color: green;
-}
-
 .day-by-day-tab .day-location {
-  font-weight: 600;
-  font-size: 1rem;
+  align-items: center;
   color: #7f8c8d;
   display: flex;
-  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
   gap: 0.3rem;
 }
 
-.day-by-day-tab .day-details {
-  padding: 1rem;
-  background: #fafbfc;
+.day-by-day-tab .day-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.day-by-day-tab .category-row {
+.day-by-day-tab .note-chip {
+  align-items: center;
+  background: #dff9fb;
+  border: 1px solid #c7ecee;
+  border-radius: 999px;
+  color: #130f40;
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  font-weight: 500;
+  gap: 0.3rem;
+  overflow: hidden;
+  padding: 0.3rem 0.6rem;
+  transition: background 0.2s;
+  white-space: normal;
+  word-break: break-word;
 }
 
-.day-by-day-tab .category-btn {
+.day-by-day-tab .note-input {
   background: #f1f3f5;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.day-by-day-tab .category-btn.active {
-  background: #27ae60;
-  color: #fff;
-}
-
-.day-by-day-tab .place-input-wrapper {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.day-by-day-tab .place-input,
-.day-by-day-tab .time-input {
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-.day-by-day-tab .place-input {
-  flex: 1;
-  min-width: 200px;
-}
-
-.day-by-day-tab .time-input {
-  width: 100px;
-}
-
-.day-by-day-tab .add-btn {
-  background: #27ae60;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.day-by-day-tab .add-btn:hover {
-  background: #219150;
-}
-
-.day-by-day-tab .place-card {
-  background: #fff;
-  border: 1px solid #dde1e4;
   border-radius: 6px;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  min-width: 160px;
+  padding: 0.5rem 0.75rem;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  width: 85%;
 }
 
-.day-by-day-tab .place-header {
-  display: flex;
+.day-by-day-tab .note-input:focus {
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.25);
+  outline: none;
+}
+
+.day-by-day-tab .note-input-wrapper {
   align-items: center;
-  gap: 0.5rem;
+  display: flex;
   flex-wrap: wrap;
-}
-
-.day-by-day-tab .badge {
-  background: #eafaf1;
-  color: #27ae60;
-  padding: 0.25rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.day-by-day-tab .place-name {
-  font-weight: 600;
-  color: #34495e;
-}
-
-.day-by-day-tab .place-time {
-  font-size: 0.85rem;
-  color: #2980b9;
-  font-weight: 500;
-}
-
-.day-by-day-tab .place-remove {
-  margin-left: auto;
-  color: #e74c3c;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.day-by-day-tab .place-remove:hover {
-  color: #c0392b;
-}
-
-.day-by-day-tab .note-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .day-by-day-tab .note-list {
@@ -180,58 +163,121 @@
   gap: 0.5rem;
 }
 
-.day-by-day-tab .note-chip {
-  background: #dff9fb;
-  color: #130f40;
-  font-weight: 500;
-  border: 1px solid #c7ecee;
-  border-radius: 999px;
-  padding: 0.3rem 0.6rem;
+.day-by-day-tab .note-section {
   display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.day-by-day-tab .place-card {
+  background: #fff;
+  border: 1px solid #dde1e4;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.day-by-day-tab .place-card.added {
+  border: 2px solid #27ae60;
+}
+
+.day-by-day-tab .place-header {
   align-items: center;
-  gap: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.day-by-day-tab .place-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem;
+}
+
+.day-by-day-tab .place-input-wrapper {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.day-by-day-tab .place-name {
+  color: #34495e;
+  font-weight: 600;
+}
+
+.day-by-day-tab .place-remove {
+  color: #e74c3c;
+  cursor: pointer;
+  margin-left: auto;
+  transition: color 0.2s;
+}
+
+.day-by-day-tab .place-remove:hover {
+  color: #c0392b;
+}
+
+.day-by-day-tab .place-time {
+  color: #2980b9;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.day-by-day-tab .suggestions-list {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  width: calc(100% - 100px - 0.5rem);
+  z-index: 1000;
+}
+
+.day-by-day-tab .suggestions-list li {
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.75rem;
   transition: background 0.2s;
 }
 
-.day-by-day-tab .note-chip:hover {
-  background: #c7ecee;
+.day-by-day-tab .suggestions-list li:hover {
+  background: #f8f9fa;
 }
 
-.day-by-day-tab .note-remove {
-  color: #e74c3c;
-  cursor: pointer;
-  margin-left: 5px;
+.day-by-day-tab .time-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  width: 100px;
 }
 
-.day-by-day-tab .note-input-wrapper {
+.day-by-day-tab .place-group {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+.day-by-day-tab .group-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
 }
-
-.day-by-day-tab .note-input {
-  border: none;
-  background: #f1f3f5;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  min-width: 160px;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.day-by-day-tab .note-input:focus {
-  outline: none;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.25);
-}
-
-.day-by-day-tab .note-input::placeholder {
-  color: #7f8c8d;
-  font-style: italic;
-}
-
-/* FontAwesome icon spacing fix */
-.day-by-day-tab i.fa {
-  display: inline-block;
-  margin-right: 0.25rem;
+.day-by-day-tab .group-title .fas {
+  margin-right: 0.5rem;
 }

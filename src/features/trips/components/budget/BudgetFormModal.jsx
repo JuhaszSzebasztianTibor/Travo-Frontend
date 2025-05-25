@@ -41,8 +41,15 @@ const BudgetFormModal = ({ item, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // send only date, category, name, amount, status
-    onSave(form);
+    const payload = {
+      day: new Date(form.day).toISOString(),
+      category: form.category,
+      name: form.name,
+      amount: parseFloat(form.amount),
+      status: form.status,
+    };
+    console.log("🏹 Submitting budget payload:", payload);
+    onSave(payload);
   };
 
   return (

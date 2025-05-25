@@ -27,7 +27,7 @@ const PlannerSidebar = () => {
           startDate: t.startDate?.slice(0, 10) || "",
           endDate: t.endDate?.slice(0, 10) || "",
           description: t.description || "",
-          imageUrl: t.image || "",
+          imageUrl: t.imageUrl || "",
           imageFile: null,
         });
       })

@@ -1,0 +1,51 @@
+.info-window {
+  width: 240px;
+  font-family: “Segoe UI”, sans-serif;
+}
+
+.info-photo-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-photo {
+  width: 170px;
+  height: 120px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.info-title {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.info-notes h5 {
+  margin: 8px 0 4px;
+  font-size: 0.95rem;
+}
+
+.info-notes ul {
+  padding-left: 1.2em;
+  margin: 0 0 8px;
+}
+
+.info-notes li {
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.info-trip {
+  font-size: 0.85rem;
+  color: #555;
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+}
+
+.info-date {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #333;
+}
