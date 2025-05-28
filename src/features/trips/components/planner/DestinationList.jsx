@@ -3,15 +3,15 @@ import { addDays } from "date-fns";
 import DestinationRow from "./DestinationRow";
 import { formatDate } from "../../../../utils/formDate";
 
-const DestinationList = ({
+export default function DestinationList({
   destinations,
   tripStartDate,
   onNightsChange,
-  onActivityClick,
+  onActivityClick, // now expects (destId, name, nights)
   onDeleteDestination,
   totalNightsPlanned,
   goal,
-}) => {
+}) {
   let cursor = tripStartDate;
 
   return (
@@ -49,16 +49,18 @@ const DestinationList = ({
 
           return (
             <DestinationRow
-              key={dest.id ?? i}
+              key={dest.id}
+              id={dest.id}
               index={i}
               name={dest.name}
               nights={dest.nights}
-              activities={dest.activities || 0}
               transport={dest.transport || null}
               startDate={formatDate(start)}
               endDate={formatDate(end)}
               onNightsChange={onNightsChange}
-              onActivityClick={() => onActivityClick(dest.name, dest.nights)}
+              onActivityClick={() =>
+                onActivityClick(dest.id, dest.name, dest.nights)
+              }
               onDelete={() => onDeleteDestination(i)}
               totalNightsPlanned={totalNightsPlanned}
               goal={goal}
@@ -68,6 +70,4 @@ const DestinationList = ({
       </div>
     </div>
   );
-};
-
-export default DestinationList;
+}

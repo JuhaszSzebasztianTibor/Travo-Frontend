@@ -1,10 +1,11 @@
+// src/features/trips/components/planner/DayByDayPlanner.jsx
 import React, { useState, useEffect } from "react";
 import { format, parseISO, addDays } from "date-fns";
 import { GENERAL_PLACE_TYPES } from "./data/generalPlaceTypes";
 import "./dayByDay.css";
 
 import {
-  getPlacesByTrip,
+  getPlacesByDayPlan,
   createPlace,
   deletePlace,
 } from "../../../../services/planner/places/placeService";
@@ -15,21 +16,21 @@ import {
 } from "../../../../services/planner/note/noteService";
 
 export default function DayByDayPlanner({
-  tripId,
   dayPlanId,
   destinations,
   startDate,
   onPlaceAdded,
+  onPlaceDeleted,
 }) {
   const [expandedDay, setExpandedDay] = useState(null);
   const [dayDetails, setDayDetails] = useState({});
   const [suggestions, setSuggestions] = useState([]);
 
-  // Build the list of days
+  // Build days list
   const parsedStart = startDate ? parseISO(startDate) : new Date();
   const days = [];
-  let cursor = parsedStart,
-    idx = 1;
+  let cursor = parsedStart;
+  let idx = 1;
   destinations.forEach((d) => {
     for (let i = 0; i < d.nights; i++) {
       days.push({
@@ -41,55 +42,62 @@ export default function DayByDayPlanner({
     cursor = addDays(cursor, d.nights);
   });
 
-  // Load existing places
+  // Load existing places for this day plan
   useEffect(() => {
-    if (!tripId) return;
+    if (!dayPlanId) return;
     (async () => {
-      const all = await getPlacesByTrip(tripId);
+      const all = await getPlacesByDayPlan(dayPlanId);
       const byDay = {};
       all.forEach((pl, origIdx) => {
         const dn = pl.dayNumber || 1;
-        if (!byDay[dn])
+        if (!byDay[dn]) {
           byDay[dn] = {
             places: [],
             newType: GENERAL_PLACE_TYPES[0].label,
             newName: "",
             newTime: "",
           };
+        }
         byDay[dn].places.push({ ...pl, newNote: "", origIdx });
       });
       setDayDetails(byDay);
     })().catch(console.error);
-  }, [tripId]);
+  }, [dayPlanId]);
 
-  const initDetail = (id) => {
-    const ex = dayDetails[id] || {};
-    const places = (ex.places || []).map((p) => ({
+  // Initialize detail state for a given day
+  const initDetail = (dayId) => {
+    const existing = dayDetails[dayId] || {};
+    const places = (existing.places || []).map((p) => ({
       ...p,
-      newNote: p.newNote ?? "",
+      newNote: p.newNote || "",
     }));
     return {
       places,
       newType: GENERAL_PLACE_TYPES[0].label,
       newName: "",
       newTime: "",
-      ...ex,
+      ...existing,
     };
   };
 
-  const toggleDay = (id) => {
-    setDayDetails((d) => ({ ...d, [id]: initDetail(id) }));
-    setExpandedDay((c) => (c === id ? null : id));
+  // Toggle expand/collapse of a day
+  const toggleDay = (dayId) => {
+    setDayDetails((d) => ({ ...d, [dayId]: initDetail(dayId) }));
+    setExpandedDay((cur) => (cur === dayId ? null : dayId));
     setSuggestions([]);
   };
-  const updateDay = (id, det) => setDayDetails((d) => ({ ...d, [id]: det }));
 
+  // Update detail object for a day
+  const updateDay = (dayId, detail) =>
+    setDayDetails((d) => ({ ...d, [dayId]: detail }));
+
+  // Format time input
   const formatTime = (v) => {
     const c = v.replace(/[^0-9:]/g, "").slice(0, 5);
     return c.length === 2 && !c.includes(":") ? `${c}:` : c;
   };
 
-  // Autocomplete suggestions
+  // Autocomplete suggestions for new place name
   useEffect(() => {
     const term = (dayDetails[expandedDay]?.newName || "").trim();
     if (!term) return setSuggestions([]);
@@ -114,15 +122,18 @@ export default function DayByDayPlanner({
     return () => ctrl.abort();
   }, [expandedDay, dayDetails]);
 
-  const pickSuggestion = async (pred) => {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?${new URLSearchParams(
-      {
-        place_id: pred.place_id,
-        fields: "name,formatted_address,geometry,photos,types",
-        key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-      }
-    )}`;
-    const res = await fetch(url);
+  // Pick an autocomplete suggestion and create the place
+  const pickSuggestion = async (s) => {
+    const detail = dayDetails[expandedDay];
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/place/details/json?${new URLSearchParams(
+        {
+          place_id: s.place_id,
+          fields: "name,geometry,photos",
+          key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+        }
+      )}`
+    );
     const { status, result } = await res.json();
     if (status !== "OK") throw new Error(status);
 
@@ -132,56 +143,68 @@ export default function DayByDayPlanner({
         }&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
       : null;
     const { lat, lng } = result.geometry.location;
+
     const dto = {
       location: result.name,
-      type: dayDetails[expandedDay].newType,
-      time: dayDetails[expandedDay].newTime,
+      type: detail.newType,
+      time: detail.newTime,
       latitude: lat,
       longitude: lng,
       photoUrl,
       notes: [],
     };
     const created = await createPlace(dayPlanId, dto);
+    onPlaceAdded(created);
 
-    const det = initDetail(expandedDay);
+    const upd = initDetail(expandedDay);
     updateDay(expandedDay, {
-      ...det,
-      places: [...det.places, { ...created, origIdx: det.places.length }],
+      ...upd,
+      places: [...upd.places, { ...created, origIdx: upd.places.length }],
       newName: "",
       newTime: "",
     });
-    onPlaceAdded(created);
     setSuggestions([]);
   };
 
+  // Delete a place both locally and notify parent
+  const handleDeletePlace = async (dayId, origIdx, placeId) => {
+    await deletePlace(dayPlanId, placeId);
+
+    // update local
+    const detail = dayDetails[dayId];
+    const filtered = detail.places.filter((p) => p.origIdx !== origIdx);
+    updateDay(dayId, { ...detail, places: filtered });
+
+    // notify parent
+    if (typeof onPlaceDeleted === "function") {
+      onPlaceDeleted(placeId);
+    }
+  };
+
+  // Add a new note to a place
   const addNewNote = async (dayId, origIdx) => {
-    const det = dayDetails[dayId];
-    const place = det.places.find((p) => p.origIdx === origIdx);
+    const detail = dayDetails[dayId];
+    const place = detail.places.find((p) => p.origIdx === origIdx);
     if (!place.newNote.trim()) return;
     await createNote(place.id, { text: place.newNote });
     const notes = await getNotesByPlace(place.id);
-    const places = det.places.map((p) =>
+    const updated = detail.places.map((p) =>
       p.origIdx === origIdx ? { ...p, notes, newNote: "" } : p
     );
-    updateDay(dayId, { ...det, places });
+    updateDay(dayId, { ...detail, places: updated });
   };
+
+  // Remove a note from a place
   const removeNote = async (dayId, origIdx, noteId) => {
-    const det = dayDetails[dayId];
-    const place = det.places.find((p) => p.origIdx === origIdx);
+    const detail = dayDetails[dayId];
+    const place = detail.places.find((p) => p.origIdx === origIdx);
     await deleteNote(place.id, noteId);
-    const places = det.places.map((p) =>
+    const updated = detail.places.map((p) =>
       p.origIdx === origIdx
         ? { ...p, notes: p.notes.filter((n) => n.id !== noteId) }
         : p
     );
-    updateDay(dayId, { ...det, places });
-  };
-
-  const handleDeletePlace = async (dayId, origIdx, placeId) => {
-    await deletePlace(dayPlanId, placeId);
-    const det = dayDetails[dayId];
-    const places = det.places.filter((p) => p.origIdx !== origIdx);
-    updateDay(dayId, { ...det, places });
+    updateDay(dayId, { ...detail, places: updated });
   };
 
   return (
@@ -189,7 +212,6 @@ export default function DayByDayPlanner({
       <div className="day-list">
         {days.map(({ id, date, location }) => {
           const detail = dayDetails[id] || initDetail(id);
-          // group by type but preserve origIdx
           const grouped = detail.places.reduce((acc, p) => {
             (acc[p.type] ||= []).push(p);
             return acc;
@@ -214,6 +236,7 @@ export default function DayByDayPlanner({
 
               {expandedDay === id && (
                 <div className="day-details">
+                  {/* Category buttons */}
                   <div className="category-row">
                     {GENERAL_PLACE_TYPES.map(({ label, icon }) => (
                       <button
@@ -230,6 +253,7 @@ export default function DayByDayPlanner({
                     ))}
                   </div>
 
+                  {/* Add place input */}
                   <div className="place-input-wrapper">
                     <input
                       className="place-input"
@@ -264,6 +288,7 @@ export default function DayByDayPlanner({
                     )}
                   </div>
 
+                  {/* Render grouped places */}
                   {Object.entries(grouped).map(([type, places]) => (
                     <div key={type} className="place-group">
                       <h4 className="group-title">
@@ -299,6 +324,8 @@ export default function DayByDayPlanner({
                               }
                             />
                           </div>
+
+                          {/* Notes section */}
                           <div className="note-section">
                             <ul className="note-list">
                               {pl.notes.map((n) => (

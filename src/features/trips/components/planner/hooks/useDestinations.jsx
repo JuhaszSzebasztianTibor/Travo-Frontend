@@ -106,12 +106,17 @@ export const useDestinations = (tripId) => {
 
   const handleDeleteDestination = async (idx) => {
     const dest = destinations[idx];
+    console.log("🗑️  Deleting destination at index", idx, "with id", dest.id);
+    // Optimistically remove from state:
     setDestinations((prev) => prev.filter((_, i) => i !== idx));
+
     if (tripId && dest.id) {
       try {
-        await deleteDestination(tripId, dest.id);
+        const response = await deleteDestination(tripId, dest.id);
+        console.log("🗑️  DELETE response:", response.status, response.data);
       } catch (err) {
-        console.error("Delete failed:", err);
+        console.error("🗑️  Delete failed:", err);
+        // Optionally, re-insert the destination on failure
       }
     }
   };

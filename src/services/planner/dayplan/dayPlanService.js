@@ -1,4 +1,3 @@
-// src/services/planner/dayplan/dayPlanService.js
 import api from "../../../api/api";
 
 const withAuth = () => ({
@@ -11,9 +10,6 @@ const withAuth = () => ({
 export const getTripDayPlans = (tripId) =>
   api.get(`/trips/${tripId}/dayplans`, withAuth()).then((res) => res.data);
 
-/**
- * Create a new day plan under a trip
- */
 export const createDayPlan = (tripId, dayPlanDto) =>
   api
     .post(`/trips/${tripId}/dayplans`, dayPlanDto, {

@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { parseISO, differenceInCalendarDays, format, addDays } from "date-fns";
+import React, { useMemo } from "react";
+import { useParams } from "react-router-dom";
+import { parseISO, differenceInCalendarDays, addDays, format } from "date-fns";
 import { useLoadScript } from "@react-google-maps/api";
-
-import { getTripById } from "../../../../services/trips/tripService";
-import { getTripBudgets } from "../../../../services/budget/budgetService";
-import {
-  getTripDayPlans,
-  createDayPlan,
-} from "../../../../services/planner/dayplan/dayPlanService";
-// swapped out:
-import { getPlacesByTrip } from "../../../../services/planner/places/placeService";
-
+import { usePlanner } from "./hooks/usePlanner";
+import { useDestinations } from "./hooks/useDestinations";
 import PlannerHeader from "./PlannerHeader";
 import DestinationList from "./DestinationList";
 import DayByDayPlanner from "./DayByDayPlanner";
 import MapView from "./MapView";
 import GoogleMapView from "./GoogleMapView";
-
-import { useDestinations } from "./hooks/useDestinations";
 import { currencySymbolsData } from "../../../../data/currencySymbolsData";
-
 import "react-circular-progressbar/dist/styles.css";
 import "./planner.css";
 
@@ -34,11 +23,7 @@ export default function Planner() {
     mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
   });
 
-  const [tripInfo, setTripInfo] = useState(null);
-  const [budgets, setBudgets] = useState([]);
-  const [dayPlanId, setDayPlanId] = useState(null);
-  const [userPlaces, setUserPlaces] = useState([]);
-
+  // DESTINATIONS CRUD
   const {
     destinations,
     newDestination,
@@ -49,136 +34,131 @@ export default function Planner() {
     handleNightsChange,
   } = useDestinations(tripId);
 
-  const [activeTab, setActiveTab] = useState("destinations");
-  const [selectedDestination, setSelectedDestination] = useState(null);
-  const [selectedNights, setSelectedNights] = useState(0);
-  const [currency, setCurrency] = useState("EUR");
+  // PLANNER LOGIC
+  const {
+    tripInfo,
+    budgets,
+    activeTab,
+    selectedDestination,
+    setActiveTab,
+    selectDestination,
+    resetSelection,
+    currentDayPlanId,
+    userPlaces,
+    setUserPlaces,
+    tripLength,
+    totalNights,
+  } = usePlanner(tripId, destinations);
 
-  // Load trip metadata and ensure a dayPlan exists
-  useEffect(() => {
-    (async () => {
-      try {
-        const t = await getTripById(tripId);
-        setTripInfo(t);
-        setBudgets(await getTripBudgets(tripId));
+  const start = tripInfo && parseISO(tripInfo.startDate);
+  const end = tripInfo && parseISO(tripInfo.endDate);
+  const totalDays = start && end ? differenceInCalendarDays(end, start) + 1 : 0;
 
-        const existing = await getTripDayPlans(tripId);
-        let planId;
-        if (existing.length) {
-          planId = existing[0].id;
-        } else {
-          const created = await createDayPlan(tripId, {
-            date: t.startDate,
-            location: t.tripName,
-            places: [],
-          });
-          planId = created.id;
-        }
-        setDayPlanId(planId);
-      } catch (err) {
-        console.error("Failed to load trip data:", err);
-      }
-    })();
-  }, [tripId]);
+  const displayNights = selectedDestination.id
+    ? selectedDestination.nights
+    : totalNights;
 
-  // Fetch all places for this trip whenever we switch to the day-by-day tab
-  useEffect(() => {
-    if (!tripId || activeTab !== "day-by-day") return;
-    (async () => {
-      try {
-        const allPlaces = await getPlacesByTrip(tripId);
-        setUserPlaces(allPlaces);
-      } catch (err) {
-        console.error("Failed to load existing places:", err);
-      }
-    })();
-  }, [tripId, activeTab]);
+  const progress = totalDays
+    ? Math.round((displayNights / totalDays) * 100)
+    : 0;
 
-  if (!tripInfo || dayPlanId == null) return <div>Loading…</div>;
+  let plannerStart = tripInfo?.startDate || "";
+  let filteredDests = destinations;
+
+  if (selectedDestination.id) {
+    const idx = destinations.findIndex((d) => d.id === selectedDestination.id);
+    const daysBefore = destinations
+      .slice(0, idx)
+      .reduce((s, d) => s + d.nights, 0);
+    plannerStart = format(addDays(start, daysBefore), "yyyy-MM-dd");
+    filteredDests = [destinations[idx]];
+  }
+
+  const allPlaces = destinations.map((d) => ({
+    latitude: +d.lat || d.latitude,
+    longitude: +d.lng || d.longitude,
+  }));
+
+  const { center, zoom } = useMemo(() => {
+    if (activeTab === "destinations" && allPlaces.length) {
+      const sum = allPlaces.reduce(
+        (acc, p) => ({
+          lat: acc.lat + p.latitude,
+          lng: acc.lng + p.longitude,
+        }),
+        { lat: 0, lng: 0 }
+      );
+      return {
+        center: {
+          lat: sum.lat / allPlaces.length,
+          lng: sum.lng / allPlaces.length,
+        },
+        zoom: 4,
+      };
+    }
+
+    if (activeTab === "day-by-day" && userPlaces.length) {
+      const last = userPlaces[userPlaces.length - 1];
+      return {
+        center: { lat: last.latitude, lng: last.longitude },
+        zoom: 14,
+      };
+    }
+
+    if (filteredDests.length) {
+      const d = filteredDests[0];
+      return {
+        center: {
+          lat: +d.lat || d.latitude,
+          lng: +d.lng || d.longitude,
+        },
+        zoom: 12,
+      };
+    }
+
+    return {
+      center: { lat: 0, lng: 0 },
+      zoom: 1.5,
+    };
+  }, [activeTab, allPlaces, userPlaces, filteredDests]);
+
+  if (!tripInfo) return <div>Loading…</div>;
   if (activeTab === "day-by-day" && (loadError || !isLoaded))
     return <div>{loadError ? "Error loading Maps" : "Loading Maps…"}</div>;
 
-  const start = parseISO(tripInfo.startDate);
-  const end = parseISO(tripInfo.endDate);
-  const tripLength = differenceInCalendarDays(end, start) + 1;
-  const totalNights = destinations.reduce((sum, d) => sum + d.nights, 0);
-
-  const selNights = selectedNights;
-  const displayNights = selectedDestination ? selNights : totalNights;
-  const displayProgress = tripLength
-    ? Math.min(100, Math.round((displayNights / tripLength) * 100))
-    : 0;
-
-  const days = [];
-
-  let plannerStart = tripInfo.startDate;
-  if (selectedDestination) {
-    const idx = destinations.findIndex((d) => d.name === selectedDestination);
-    const daysBefore = destinations
-      .slice(0, idx)
-      .reduce((a, d) => a + d.nights, 0);
-    plannerStart = format(addDays(start, daysBefore), "yyyy-MM-dd");
-  }
-
-  const filtered = selectedDestination
-    ? destinations.filter((d) => d.name === selectedDestination)
-    : destinations;
-
-  const center = userPlaces.length
-    ? {
-        lat: userPlaces[userPlaces.length - 1].latitude,
-        lng: userPlaces[userPlaces.length - 1].longitude,
-      }
-    : filtered.length
-    ? { lat: +filtered[0].latitude, lng: +filtered[0].longitude }
-    : { lat: 0, lng: 0 };
-
-  const handleActivityClick = (name, nights) => {
-    setSelectedDestination(name);
-    setSelectedNights(nights);
-    setActiveTab("day-by-day");
-  };
-
-  const handlePlaceAdded = (newPlace) =>
-    setUserPlaces((prev) => [...prev, newPlace]);
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    if (tab === "destinations") {
-      setSelectedDestination(null);
-      setSelectedNights(0);
-    }
-  };
-
   return (
     <div className="planner-container">
-      <aside className="left-panel">
+      <aside
+        className={`left-panel ${
+          activeTab === "day-by-day" ? "no-scroll" : ""
+        }`}
+      >
         <PlannerHeader
           tripName={tripInfo.tripName}
           startDate={tripInfo.startDate}
           endDate={tripInfo.endDate}
           nightsPlanned={displayNights}
-          progress={displayProgress}
-          goal={tripLength}
-          currency={currency}
+          progress={progress}
+          goal={totalDays}
           currencySymbols={currencySymbolsData}
+          currency={budgets[0]?.currency || "EUR"}
           amount={budgets.reduce((sum, b) => sum + b.amount, 0)}
-          handleCurrencyChange={setCurrency}
-          selectedDestination={selectedDestination}
-          selectedDestinationNights={selNights}
+          handleCurrencyChange={() => {}}
+          selectedDestination={selectedDestination.name}
+          selectedDestinationNights={selectedDestination.nights}
         />
 
         <nav className="planner-tabs">
           <ul>
             <li
               className={activeTab === "destinations" ? "active" : ""}
-              onClick={() => handleTabChange("destinations")}
+              onClick={resetSelection}
             >
               Destinations
             </li>
             <li
               className={activeTab === "day-by-day" ? "active" : ""}
-              onClick={() => handleTabChange("day-by-day")}
+              onClick={() => setActiveTab("day-by-day")}
             >
               Day by day
             </li>
@@ -192,15 +172,12 @@ export default function Planner() {
               tripStartDate={tripInfo.startDate}
               onNightsChange={handleNightsChange}
               onDeleteDestination={handleDeleteDestination}
-              onActivityClick={handleActivityClick}
+              onActivityClick={selectDestination}
               totalNightsPlanned={totalNights}
-              goal={tripLength}
-              dayDate={days.find((d) => d.id === expandedDay)?.date}
+              goal={totalDays}
             />
-
             <div className="add-destination-btn">
               <input
-                type="text"
                 value={newDestination}
                 onChange={handleInputChange}
                 placeholder="Add new destination…"
@@ -219,11 +196,13 @@ export default function Planner() {
           </>
         ) : (
           <DayByDayPlanner
-            tripId={tripId}
-            dayPlanId={dayPlanId}
-            destinations={filtered}
-            startDate={tripInfo.startDate}
-            onPlaceAdded={handlePlaceAdded}
+            dayPlanId={currentDayPlanId}
+            destinations={filteredDests}
+            startDate={plannerStart}
+            onPlaceAdded={(p) => setUserPlaces((prev) => [...prev, p])}
+            onPlaceDeleted={(deletedId) =>
+              setUserPlaces((prev) => prev.filter((pl) => pl.id !== deletedId))
+            }
           />
         )}
       </aside>
@@ -234,6 +213,7 @@ export default function Planner() {
         ) : (
           <GoogleMapView
             center={center}
+            zoom={zoom}
             userPlaces={userPlaces}
             tripInfo={tripInfo}
           />

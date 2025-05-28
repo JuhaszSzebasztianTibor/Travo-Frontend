@@ -1,7 +1,7 @@
-// src/components/planner/DestinationRow.jsx
 import React from "react";
 
 export default function DestinationRow({
+  id,
   index,
   name,
   nights,
@@ -65,25 +65,28 @@ export default function DestinationRow({
         </div>
       </div>
 
-      {/* Sleep, Discover, Transport icons */}
+      {/* Sleep */}
       <div className="destination-sleep destination-column">
         <a
           className="add-btn"
           href=""
           onClick={(e) => {
-            e.preventDefault(); // prevents the jump
+            e.preventDefault();
           }}
         >
           <i className="fa fa-plus-circle"></i>
         </a>
       </div>
+
+      {/* Discover (to-do's) */}
       <div className="destination-activities destination-column">
         <a
           className="add-btn"
           href=""
           onClick={(e) => {
             e.preventDefault();
-            onActivityClick(name, nights);
+            // PASS id first, then name and nights
+            onActivityClick(id, name, nights);
           }}
         >
           {activities > 0 ? (
@@ -95,6 +98,8 @@ export default function DestinationRow({
           )}
         </a>
       </div>
+
+      {/* Transport */}
       <div className="destination-transport destination-column">
         <a className="add-btn" href="">
           {transport ? (
