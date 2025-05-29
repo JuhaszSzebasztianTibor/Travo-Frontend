@@ -355,6 +355,12 @@ export default function DayByDayPlanner({
                                   );
                                   updateDay(id, { ...det0, places });
                                 }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    addNewNote(id, pl.origIdx);
+                                  }
+                                }}
                               />
                               <button
                                 className="add-btn"

@@ -101,12 +101,14 @@ export default function DestinationRow({
 
       {/* Transport */}
       <div className="destination-transport destination-column">
-        <a className="add-btn" href="">
-          {transport ? (
-            <span className="transport-selected">{transport}</span>
-          ) : (
-            <i className="fa fa-plus-circle"></i>
-          )}
+        <a
+          className="add-btn"
+          href=""
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <i className="fa fa-plus-circle"></i>
         </a>
       </div>
 
