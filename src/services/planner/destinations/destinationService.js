@@ -1,4 +1,3 @@
-// src/services/planner/destinations/destinationService.js
 import api from "../../../api/api";
 
 const withAuth = () => ({

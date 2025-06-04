@@ -7,7 +7,7 @@ export default function DestinationList({
   destinations,
   tripStartDate,
   onNightsChange,
-  onActivityClick, // now expects (destId, name, nights)
+  onActivityClick,
   onDeleteDestination,
   totalNightsPlanned,
   goal,
