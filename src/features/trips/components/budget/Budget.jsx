@@ -57,7 +57,7 @@ const Budget = () => {
         items={items}
         onAdd={() => openModal()}
         onEdit={openModal}
-        onDelete={openDelete} // pass the full item
+        onDelete={openDelete}
         getIcon={getCategoryIcon}
       />
 
@@ -65,7 +65,8 @@ const Budget = () => {
         items={items}
         onAdd={openModal}
         onEdit={openModal}
-        onDelete={openDelete} // pass the full item
+        onDelete={openDelete}
+        î
         getIcon={getCategoryIcon}
       />
 
